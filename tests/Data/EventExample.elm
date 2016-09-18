@@ -1,6 +1,4 @@
-module EventExample exposing (json)
--- import Date
--- import TicketMaster exposing (EventStatus(Rescheduled))
+module Data.EventExample exposing (json)
 
 json : String
 json = """

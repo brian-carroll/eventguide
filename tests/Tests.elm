@@ -2,29 +2,34 @@ module Tests exposing (all)
 
 import Test exposing (Test, describe, test)
 import Expect exposing (true)
-import EventExample
 import TicketMaster
 import Json.Decode
+
+import Data.EventExample as EventExample
+import Data.ProblemEvent as ProblemEvent
+import Data.TicketMasterResponse as TicketMasterResponse
 
 all : Test
 all =
     describe "eventguide"
-        [ decodeTicketMasterEvent
+        [ decodeTicketMasterResponse
         ]
 
-decodeTicketMasterEvent : Test
-decodeTicketMasterEvent =
+decodeTicketMasterResponse : Test
+decodeTicketMasterResponse =
     let
-        decodeResult =
-            Json.Decode.decodeString TicketMaster.eventDecoder EventExample.json
-
-        decodesWithoutErrors =
-            case decodeResult of
+        noErrors decoder data =
+            case Json.Decode.decodeString decoder data of
                 Ok _ ->
                     True
                 Err _ ->
                     False
     in
-    describe "TicketMaster JSON decoder"
-        [ test "can decode an event" (\_ -> Expect.true "Decoder error" decodesWithoutErrors)
-        ]
+        describe "TicketMaster JSON decoder"
+            [ test "can decode a single event"
+                (\_ -> Expect.true "Decoder error" (noErrors TicketMaster.eventDecoder EventExample.json))
+            , test "can decode an event with double quotes in string field ('pleaseNote')"
+                (\_ -> Expect.true "Decoder error" (noErrors TicketMaster.eventDecoder ProblemEvent.json))
+            , test "can decode multiple events"
+                (\_ -> Expect.true "Decoder error" (noErrors TicketMaster.responseDecoder TicketMasterResponse.json))
+            ]

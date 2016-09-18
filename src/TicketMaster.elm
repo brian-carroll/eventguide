@@ -7,6 +7,36 @@ import String
 import List
 
 
+type alias Response =
+    { events : List Event
+    , page : Page
+    }
+
+responseDecoder : Decoder Response
+responseDecoder =
+    decode Response
+        |> requiredAt ["_embedded", "events"] (list eventDecoder)
+        |> required "page" pageDecoder
+
+-------------------------------------------------
+
+type alias Page =
+    { size : Int
+    , totalElements : Int
+    , totalPages : Int
+    , number : Int
+    }
+
+pageDecoder : Decoder Page
+pageDecoder =
+    decode Page
+        |> required "size" int
+        |> required "totalElements" int
+        |> required "totalPages" int
+        |> required "number" int
+
+-------------------------------------------------
+
 type alias Event =
     { name : String
     , type' : String
