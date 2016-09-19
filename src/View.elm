@@ -1,9 +1,16 @@
 module View exposing (root)
 
-import Html.App as Html
+-- External modules
+import Html exposing (Html, div, text)
+import Http
+
+-- Local modules
 import Types exposing (..)
 
 
 
 root : Model -> Html Msg
-root model = ..
+root model =
+    div []
+        [ text (toString model)
+        ]
