@@ -26,7 +26,7 @@ searchUrl =
 
 init : (Model, Cmd Msg)
 init = 
-    ({ data = NotAsked }, fetchEvents)
+    ({ data = Loading }, fetchEvents)
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
