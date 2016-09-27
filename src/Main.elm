@@ -1,5 +1,9 @@
 module Main exposing (main)
 
+{-| Event guide with imported content on listed events
+@docs main
+-}
+
 -- External modules
 --import Html.App as App
 import TimeTravel.Html.App as App
@@ -40,6 +44,8 @@ update msg model =
 
 
 
+{-| Entry point for the app
+-}
 main : Program Never
 main =
   App.program

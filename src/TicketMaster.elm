@@ -264,17 +264,17 @@ salesDecoder =
 -------------------------------------------------
 
 type alias PublicSale = 
-    { startDateTime : Date
+    { startDateTime : Maybe Date
     , startTBD : Bool
-    , endDateTime : Date
+    , endDateTime : Maybe Date
     }
 
 publicSaleDecoder : Decoder PublicSale
 publicSaleDecoder =
     decode PublicSale
-        |> required "startDateTime" dateDecoder
+        |> optional "startDateTime" (maybe dateDecoder) Nothing
         |> required "startTBD" bool
-        |> required "endDateTime" dateDecoder
+        |> optional "endDateTime" (maybe dateDecoder) Nothing
 
 -------------------------------------------------
 
