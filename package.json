@@ -13,7 +13,8 @@
   },
   "scripts": {
     "clean": "rm -rf tests/elm-stuff/build-artifacts/*/user ; rm -rf elm-stuff/build-artifacts/*/user",
-    "test": "npm run clean ; elm test"
+    "test": "npm run clean ; elm test",
+    "build": "elm make src/Main.elm --output index.html"
   },
   "author": "",
   "license": "ISC"
