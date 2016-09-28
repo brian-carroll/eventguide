@@ -426,26 +426,17 @@ selectImageUrl ratio height imageList =
         correctRatioImages =
             List.filter (\i -> i.ratio == ratio) imageList
 
-        foundImage =
-            List.head (List.filter (\i -> i.height == height) correctRatioImages)
+        sortBySuitability images =
+            List.sortBy (\i -> abs (i.height - height)) images
     in
-        case foundImage of
-            Just image ->
-                image.url
+        case (sortBySuitability correctRatioImages) of
+            h :: t ->
+                .url h
 
-            Nothing ->
-                let
-                    sortBySuitability images =
-                        List.sortBy (\i -> abs (i.height - height)) images
-                in
-                    case (sortBySuitability correctRatioImages) of
-                        h :: t ->
-                            .url h
+            [] ->
+                case (sortBySuitability imageList) of
+                    h :: t ->
+                        .url h
 
-                        [] ->
-                            case (sortBySuitability imageList) of
-                                h :: t ->
-                                    .url h
-
-                                [] ->
-                                    ""
+                    [] ->
+                        ""
