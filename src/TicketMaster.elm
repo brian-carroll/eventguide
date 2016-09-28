@@ -12,13 +12,17 @@ type alias Response =
     , page : Page
     }
 
+
 responseDecoder : Decoder Response
 responseDecoder =
     decode Response
-        |> requiredAt ["_embedded", "events"] (list eventDecoder)
+        |> requiredAt [ "_embedded", "events" ] (list eventDecoder)
         |> required "page" pageDecoder
 
+
+
 -------------------------------------------------
+
 
 type alias Page =
     { size : Int
@@ -26,6 +30,7 @@ type alias Page =
     , totalPages : Int
     , number : Int
     }
+
 
 pageDecoder : Decoder Page
 pageDecoder =
@@ -35,7 +40,10 @@ pageDecoder =
         |> required "totalPages" int
         |> required "number" int
 
+
+
 -------------------------------------------------
+
 
 type alias Event =
     { name : String
@@ -54,6 +62,7 @@ type alias Event =
     , links : Links
     , embedded : Embedded
     }
+
 
 eventDecoder : Decoder Event
 eventDecoder =
@@ -74,12 +83,16 @@ eventDecoder =
         |> required "_links" linksDecoder
         |> optional "_embedded" embeddedDecoder emptyEmbedded
 
+
+
 -------------------------------------------------
+
 
 type alias Embedded =
     { venues : List Venue
     , attractions : List Attraction
     }
+
 
 embeddedDecoder : Decoder Embedded
 embeddedDecoder =
@@ -87,13 +100,17 @@ embeddedDecoder =
         |> optional "venues" (list venueDecoder) []
         |> optional "attractions" (list attractionDecoder) []
 
+
 emptyEmbedded : Embedded
 emptyEmbedded =
     { venues = []
     , attractions = []
     }
 
+
+
 -------------------------------------------------
+
 
 type alias Attraction =
     { name : String
@@ -101,6 +118,7 @@ type alias Attraction =
     , images : List Image
     , classifications : List Classification
     }
+
 
 attractionDecoder : Decoder Attraction
 attractionDecoder =
@@ -110,13 +128,17 @@ attractionDecoder =
         |> required "images" (list imageDecoder)
         |> required "classifications" (list classificationDecoder)
 
+
+
 -------------------------------------------------
+
 
 type alias Venue =
     { name : String
     , url : String
     , links : Links
     }
+
 
 venueDecoder : Decoder Venue
 venueDecoder =
@@ -125,7 +147,10 @@ venueDecoder =
         |> required "url" string
         |> required "_links" linksDecoder
 
+
+
 -------------------------------------------------
+
 
 type alias Links =
     { self : String
@@ -133,21 +158,25 @@ type alias Links =
     , venues : List String
     }
 
+
 linksDecoder : Decoder Links
 linksDecoder =
-    decode Links 
+    decode Links
         |> required "self" ("href" := string)
         |> optional "attractions" (list ("href" := string)) []
         |> optional "venues" (list ("href" := string)) []
-    
+
+
 
 -------------------------------------------------
+
 
 type alias Promoter =
     { id : String
     , name : String
     , description : String
     }
+
 
 promoterDecoder : Decoder Promoter
 promoterDecoder =
@@ -156,7 +185,10 @@ promoterDecoder =
         |> required "name" string
         |> required "description" string
 
+
+
 -------------------------------------------------
+
 
 type alias Classification =
     { primary : Bool
@@ -164,6 +196,7 @@ type alias Classification =
     , genre : IdAndName
     , subGenre : IdAndName
     }
+
 
 classificationDecoder : Decoder Classification
 classificationDecoder =
@@ -173,12 +206,16 @@ classificationDecoder =
         |> required "genre" idAndNameDecoder
         |> required "subGenre" idAndNameDecoder
 
+
+
 -------------------------------------------------
+
 
 type alias IdAndName =
     { id : String
     , name : String
     }
+
 
 idAndNameDecoder : Decoder IdAndName
 idAndNameDecoder =
@@ -186,7 +223,10 @@ idAndNameDecoder =
         |> required "id" string
         |> required "name" string
 
+
+
 -------------------------------------------------
+
 
 type alias EventDates =
     { start : EventStartDate
@@ -194,25 +234,29 @@ type alias EventDates =
     , status : EventStatus
     }
 
+
 eventDatesDecoder : Decoder EventDates
 eventDatesDecoder =
     decode EventDates
         |> required "start" eventStartDateDecoder
         |> required "timezone" string
-        |> requiredAt ["status", "code"] eventStatusDecoder
+        |> requiredAt [ "status", "code" ] eventStatusDecoder
+
 
 
 -------------------------------------------------
 
+
 type alias EventStartDate =
     { localDate : String
-    , localTime : String 
+    , localTime : String
     , dateTime : Date
     , dateTBD : Bool
     , dateTBA : Bool
     , timeTBA : Bool
     , noSpecificTime : Bool
     }
+
 
 eventStartDateDecoder : Decoder EventStartDate
 eventStartDateDecoder =
@@ -225,14 +269,21 @@ eventStartDateDecoder =
         |> required "timeTBA" bool
         |> required "noSpecificTime" bool
 
+
+
 -------------------------------------------------
+
 
 type EventStatus
     = OnSale
     | OffSale
     | Rescheduled
     | Cancelled
-    -- | Unknown  -- some other string we didn't expect
+
+
+
+-- | Unknown  -- some other string we didn't expect
+
 
 eventStatusDecoder : Decoder EventStatus
 eventStatusDecoder =
@@ -240,20 +291,33 @@ eventStatusDecoder =
         getResult : String -> Result String EventStatus
         getResult str =
             case str of
-                "onsale" -> Ok OnSale
-                "offsale" -> Ok OffSale
-                "rescheduled" -> Ok Rescheduled
-                "cancelled" -> Ok Cancelled
-                _ -> Err ("Unknown event status: " ++ str)
+                "onsale" ->
+                    Ok OnSale
+
+                "offsale" ->
+                    Ok OffSale
+
+                "rescheduled" ->
+                    Ok Rescheduled
+
+                "cancelled" ->
+                    Ok Cancelled
+
+                _ ->
+                    Err ("Unknown event status: " ++ str)
     in
         Json.Decode.customDecoder string getResult
 
+
+
 -------------------------------------------------
+
 
 type alias Sales =
     { public : PublicSale
     , presales : List PreSale
     }
+
 
 salesDecoder : Decoder Sales
 salesDecoder =
@@ -261,13 +325,17 @@ salesDecoder =
         |> required "public" publicSaleDecoder
         |> optional "presales" (list preSaleDecoder) []
 
+
+
 -------------------------------------------------
 
-type alias PublicSale = 
+
+type alias PublicSale =
     { startDateTime : Maybe Date
     , startTBD : Bool
     , endDateTime : Maybe Date
     }
+
 
 publicSaleDecoder : Decoder PublicSale
 publicSaleDecoder =
@@ -276,13 +344,17 @@ publicSaleDecoder =
         |> required "startTBD" bool
         |> optional "endDateTime" (maybe dateDecoder) Nothing
 
+
+
 -------------------------------------------------
 
-type alias PreSale = 
+
+type alias PreSale =
     { startDateTime : Date
     , endDateTime : Date
     , name : String
     }
+
 
 preSaleDecoder : Decoder PreSale
 preSaleDecoder =
@@ -291,15 +363,19 @@ preSaleDecoder =
         |> required "endDateTime" dateDecoder
         |> required "name" string
 
+
+
 -------------------------------------------------
 
+
 type alias Image =
-    { ratio: (Int, Int)
-    , url: String
-    , width: Int
-    , height: Int
-    , fallback: Bool
+    { ratio : ( Int, Int )
+    , url : String
+    , width : Int
+    , height : Int
+    , fallback : Bool
     }
+
 
 imageDecoder : Decoder Image
 imageDecoder =
@@ -310,10 +386,11 @@ imageDecoder =
         |> required "height" int
         |> required "fallback" bool
 
-imageRatioDecoder : Decoder (Int, Int)
+
+imageRatioDecoder : Decoder ( Int, Int )
 imageRatioDecoder =
     let
-        getResult : String -> Result String (Int, Int)
+        getResult : String -> Result String ( Int, Int )
         getResult str =
             let
                 intResults =
@@ -321,22 +398,29 @@ imageRatioDecoder =
                         |> List.map String.toInt
             in
                 case intResults of
-                    (Ok w)::(Ok h)::[] ->
-                        Ok (w, h)
+                    (Ok w) :: (Ok h) :: [] ->
+                        Ok ( w, h )
+
                     _ ->
                         Err "Can't decode image width and height"
     in
         Json.Decode.customDecoder string getResult
 
+
+
 -------------------------------------------------
+
 
 dateDecoder : Decoder (Date.Date)
 dateDecoder =
     Json.Decode.customDecoder string Date.fromString
 
+
+
 -------------------------------------------------
 
-selectImageUrl : (Int, Int) -> Int -> List Image -> String
+
+selectImageUrl : ( Int, Int ) -> Int -> List Image -> String
 selectImageUrl ratio height imageList =
     let
         correctRatioImages =
@@ -355,12 +439,12 @@ selectImageUrl ratio height imageList =
                         List.sortBy (\i -> abs (i.height - height)) images
                 in
                     case (sortBySuitability correctRatioImages) of
-                        h::t ->
+                        h :: t ->
                             .url h
 
                         [] ->
                             case (sortBySuitability imageList) of
-                                h::t ->
+                                h :: t ->
                                     .url h
 
                                 [] ->

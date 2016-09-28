@@ -6,11 +6,14 @@ module Main exposing (main)
 
 -- External modules
 --import Html.App as App
+
 import TimeTravel.Html.App as App
 import Task
 import Http
 
+
 -- Local modules
+
 import TicketMaster
 import Types exposing (..)
 import View
@@ -27,13 +30,12 @@ searchUrl =
     "https://app.ticketmaster.com/discovery/v2/events.json?city=london&countryCode=gb&classificationName=music{&page,size,sort}&apikey=NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu"
 
 
+init : ( Model, Cmd Msg )
+init =
+    ( { data = Loading }, fetchEvents )
 
-init : (Model, Cmd Msg)
-init = 
-    ({ data = Loading }, fetchEvents)
 
-
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SearchFail e ->
@@ -43,14 +45,13 @@ update msg model =
             ( { data = Success response }, Cmd.none )
 
 
-
 {-| Entry point for the app
 -}
 main : Program Never
 main =
-  App.program
-    { init = init
-    , update = update
-    , subscriptions = (\_ -> Sub.none)
-    , view = View.root
-    }
+    App.program
+        { init = init
+        , update = update
+        , subscriptions = (\_ -> Sub.none)
+        , view = View.root
+        }
