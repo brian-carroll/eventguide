@@ -16,6 +16,7 @@ root model =
         [ tmdata model.data
         ]
 
+
 tmdata : WebData { a | events : List TicketMaster.Event } -> Html Msg
 tmdata webdata =
     case webdata of
@@ -36,14 +37,17 @@ tmevent event =
         [ a [ href event.url ]
             [ text event.name
             ]
-        , img [src (firstEventImageUrl event)] []
+        , img [src (getEventImageUrl event)] []
         ]
 
-firstEventImageUrl : TicketMaster.Event -> String
-firstEventImageUrl event =
-    case List.head event.images of
-        Nothing ->
-            ""
 
-        Just image ->
-            image.url
+getEventImageUrl : TicketMaster.Event -> String
+getEventImageUrl event =
+    let
+        ratio =
+            (16, 9)
+
+        height =
+            115
+    in
+        TicketMaster.selectImageUrl ratio height event.images

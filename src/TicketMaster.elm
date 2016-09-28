@@ -333,3 +333,35 @@ imageRatioDecoder =
 dateDecoder : Decoder (Date.Date)
 dateDecoder =
     Json.Decode.customDecoder string Date.fromString
+
+-------------------------------------------------
+
+selectImageUrl : (Int, Int) -> Int -> List Image -> String
+selectImageUrl ratio height imageList =
+    let
+        correctRatioImages =
+            List.filter (\i -> i.ratio == ratio) imageList
+
+        foundImage =
+            List.head (List.filter (\i -> i.height == height) correctRatioImages)
+    in
+        case foundImage of
+            Just image ->
+                image.url
+
+            Nothing ->
+                let
+                    sortBySuitability images =
+                        List.sortBy (\i -> abs (i.height - height)) images
+                in
+                    case (sortBySuitability correctRatioImages) of
+                        h::t ->
+                            .url h
+
+                        [] ->
+                            case (sortBySuitability imageList) of
+                                h::t ->
+                                    .url h
+
+                                [] ->
+                                    ""
