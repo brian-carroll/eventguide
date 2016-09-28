@@ -27,6 +27,7 @@ fetchEvents =
 
 searchUrl : String
 searchUrl =
+    -- "/tests/Data/ticketmaster.json"
     "https://app.ticketmaster.com/discovery/v2/events.json?city=london&countryCode=gb&classificationName=music{&page,size,sort}&apikey=NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu"
 
 

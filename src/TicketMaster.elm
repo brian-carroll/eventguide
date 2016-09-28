@@ -420,23 +420,56 @@ dateDecoder =
 -------------------------------------------------
 
 
+{-| Pick the best available image, given target aspect ratio and height.
+Intended for use with "background-image" and "background-size: cover"
+1st priority: pick the closest aspect ratio, to avoid clipping if possible
+2nd priority: pick the smallest image that's big enough to cover the target area
+-}
 selectImageUrl : ( Int, Int ) -> Int -> List Image -> String
 selectImageUrl ratio height imageList =
     let
-        correctRatioImages =
-            List.filter (\i -> i.ratio == ratio) imageList
+        targetRatio =
+            toFloat (fst ratio) / toFloat (snd ratio)
 
-        sortBySuitability images =
-            List.sortBy (\i -> abs (i.height - height)) images
+        width =
+            (ceiling ((toFloat height) * targetRatio))
+
+        selectBetterOfTwoImages : Image -> Image -> Image
+        selectBetterOfTwoImages currentImage bestImage =
+            let
+                ratioDiff img =
+                    abs ((toFloat (fst img.ratio) / toFloat (snd img.ratio)) - targetRatio)
+
+                ratioDiffComparison =
+                    compare (ratioDiff currentImage) (ratioDiff bestImage)
+
+                currentCoversTarget =
+                    (currentImage.width >= width) && (currentImage.height >= height)
+            in
+                case ratioDiffComparison of
+                    LT ->
+                        currentImage
+
+                    GT ->
+                        bestImage
+
+                    EQ ->
+                        if currentCoversTarget then
+                            -- Big enough to cover the target element => pick the smallest
+                            if currentImage.width < bestImage.width then
+                                currentImage
+                            else
+                                bestImage
+                        else
+                            -- Too small to cover the target element => pick the biggest
+                            if currentImage.width > bestImage.width then
+                                currentImage
+                            else
+                                bestImage
     in
-        case (sortBySuitability correctRatioImages) of
-            h :: t ->
-                .url h
-
+        case imageList of
             [] ->
-                case (sortBySuitability imageList) of
-                    h :: t ->
-                        .url h
+                ""
 
-                    [] ->
-                        ""
+            h :: t ->
+                .url (List.foldl selectBetterOfTwoImages h t)
