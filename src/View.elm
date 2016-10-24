@@ -32,17 +32,25 @@ tmdata webdata =
             text (toString error)
 
         Success data ->
-            div []
+            div [ class "container-fluid" ]
                 (List.map tmevent data.events)
 
 
 tmevent : TicketMaster.Event -> Html Msg
 tmevent event =
-    div []
+    div [ class "row" ]
         [ a [ href event.url ]
-            [ text event.name
+            [ h3 []
+                [ text event.name ]
             ]
-        , img [ src (getEventImageUrl event) ] []
+        , div [ class "row" ]
+            [ div [ class "col-md-6" ]
+                [ img [ src (getEventImageUrl event) ] []
+                ]
+            , div [ class "col-md-6" ]
+                [ img [ src (getEventImageUrl event) ] []
+                ]
+            ]
         ]
 
 
