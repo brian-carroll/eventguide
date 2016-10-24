@@ -6,14 +6,30 @@ module Api.YouTube exposing (..)
 -- import Json.Encode
 import Json.Decode exposing (Decoder, string, list, int, object1, fail, andThen, (:=))
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
+import Http
 
-type alias Search =
+
+apiKey : String
+apiKey =
+    "AIzaSyAftxgHVWzom7wrW-mRNchNdaqeE14Ip8g"
+
+
+searchUrl : String -> String
+searchUrl searchTerm =
+    Http.url "https://www.googleapis.com/youtube/v3/search"
+        [ ("part", "snippet")
+        , ("q", (Http.uriEncode searchTerm))
+        , ("key", apiKey)
+        ]
+
+
+type alias SearchResult =
     { kind : String
     , etag : String
     , nextPageToken : String
     , regionCode : String
     , pageInfo : SearchPageInfo
-    , items : List SearchResult
+    , items : List SearchResultItem
     }
 
 type alias SearchPageInfo =
@@ -21,72 +37,37 @@ type alias SearchPageInfo =
     , resultsPerPage : Int
     }
 
-type alias SearchResult =
+type alias SearchResultItem =
     { kind : String
     , etag : String
-    , id : SearchResultId
-    , snippet : SearchResultSnippet
+    , id : SearchResultItemId
+    , snippet : SearchResultItemSnippet
     }
 
-type SearchResultId
+type SearchResultItemId
     = Channel String
     | Video String
     | Playlist String
 
-type alias SearchResultSnippetThumbnail =
+type alias SearchResultItemSnippetThumbnail =
     { url : String
     }
 
-type alias SearchResultSnippetThumbnails =
-    { default : SearchResultSnippetThumbnail
-    , medium : SearchResultSnippetThumbnail
-    , high : SearchResultSnippetThumbnail
+type alias SearchResultItemSnippetThumbnails =
+    { default : SearchResultItemSnippetThumbnail
+    , medium : SearchResultItemSnippetThumbnail
+    , high : SearchResultItemSnippetThumbnail
     }
 
-type alias SearchResultSnippet =
+type alias SearchResultItemSnippet =
     { publishedAt : String
     , channelId : String
     , title : String
     , description : String
-    , thumbnails : SearchResultSnippetThumbnails
+    , thumbnails : SearchResultItemSnippetThumbnails
     , channelTitle : String
     , liveBroadcastContent : String
     }
-
-
-decodeSearch : Decoder Search
-decodeSearch =
-    decode Search
-        |> required "kind" (string)
-        |> required "etag" (string)
-        |> required "nextPageToken" (string)
-        |> required "regionCode" (string)
-        |> required "pageInfo" (decodeSearchPageInfo)
-        |> required "items" (list decodeSearchResult)
-
-decodeSearchPageInfo : Decoder SearchPageInfo
-decodeSearchPageInfo =
-    decode SearchPageInfo
-        |> required "totalResults" (int)
-        |> required "resultsPerPage" (int)
-
--- encodeSearch : Search -> Json.Encode.Value
--- encodeSearch record =
---     Json.Encode.object
---         [ ("kind",  Json.Encode.string <| record.kind)
---         , ("etag",  Json.Encode.string <| record.etag)
---         , ("nextPageToken",  Json.Encode.string <| record.nextPageToken)
---         , ("regionCode",  Json.Encode.string <| record.regionCode)
---         , ("pageInfo",  encodeSearchPageInfo <| record.pageInfo)
---         , ("items",  Json.Encode.list <| List.map encodeSearchResult <| record.items)
---         ]
-
--- encodeSearchPageInfo : SearchPageInfo -> Json.Encode.Value
--- encodeSearchPageInfo record =
---     Json.Encode.object
---         [ ("totalResults",  Json.Encode.int <| record.totalResults)
---         , ("resultsPerPage",  Json.Encode.int <| record.resultsPerPage)
---         ]
 
 
 decodeSearchResult : Decoder SearchResult
@@ -94,14 +75,30 @@ decodeSearchResult =
     decode SearchResult
         |> required "kind" (string)
         |> required "etag" (string)
-        |> required "id" (decodeSearchResultId)
-        |> required "snippet" (decodeSearchResultSnippet)
+        |> required "nextPageToken" (string)
+        |> required "regionCode" (string)
+        |> required "pageInfo" (decodeSearchPageInfo)
+        |> required "items" (list decodeSearchResultItem)
 
-decodeSearchResultId : Decoder SearchResultId
-decodeSearchResultId =
+decodeSearchPageInfo : Decoder SearchPageInfo
+decodeSearchPageInfo =
+    decode SearchPageInfo
+        |> required "totalResults" (int)
+        |> required "resultsPerPage" (int)
+
+decodeSearchResultItem : Decoder SearchResultItem
+decodeSearchResultItem =
+    decode SearchResultItem
+        |> required "kind" (string)
+        |> required "etag" (string)
+        |> required "id" (decodeSearchResultItemId)
+        |> required "snippet" (decodeSearchResultItemSnippet)
+
+decodeSearchResultItemId : Decoder SearchResultItemId
+decodeSearchResultItemId =
     ("kind" := string) `andThen` idKind
 
-idKind : String -> Decoder SearchResultId
+idKind : String -> Decoder SearchResultItemId
 idKind kind =
     case kind of
         "youtube#channel" ->
@@ -113,79 +110,97 @@ idKind kind =
         _ ->
             fail "Unknown kind of YouTube object"
 
-decodeSearchResultSnippetThumbnail : Decoder SearchResultSnippetThumbnail
-decodeSearchResultSnippetThumbnail =
-    decode SearchResultSnippetThumbnail
+decodeSearchResultItemSnippetThumbnail : Decoder SearchResultItemSnippetThumbnail
+decodeSearchResultItemSnippetThumbnail =
+    decode SearchResultItemSnippetThumbnail
         |> required "url" (string)
 
-decodeSearchResultSnippetThumbnails : Decoder SearchResultSnippetThumbnails
-decodeSearchResultSnippetThumbnails =
-    decode SearchResultSnippetThumbnails
-        |> required "default" (decodeSearchResultSnippetThumbnail)
-        |> required "medium" (decodeSearchResultSnippetThumbnail)
-        |> required "high" (decodeSearchResultSnippetThumbnail)
+decodeSearchResultItemSnippetThumbnails : Decoder SearchResultItemSnippetThumbnails
+decodeSearchResultItemSnippetThumbnails =
+    decode SearchResultItemSnippetThumbnails
+        |> required "default" (decodeSearchResultItemSnippetThumbnail)
+        |> required "medium" (decodeSearchResultItemSnippetThumbnail)
+        |> required "high" (decodeSearchResultItemSnippetThumbnail)
 
-decodeSearchResultSnippet : Decoder SearchResultSnippet
-decodeSearchResultSnippet =
-    decode SearchResultSnippet
+decodeSearchResultItemSnippet : Decoder SearchResultItemSnippet
+decodeSearchResultItemSnippet =
+    decode SearchResultItemSnippet
         |> required "publishedAt" (string)
         |> required "channelId" (string)
         |> required "title" (string)
         |> required "description" (string)
-        |> required "thumbnails" (decodeSearchResultSnippetThumbnails)
+        |> required "thumbnails" (decodeSearchResultItemSnippetThumbnails)
         |> required "channelTitle" (string)
         |> required "liveBroadcastContent" (string)
 
--- encodeSearchResult : SearchResult -> Json.Encode.Value
--- encodeSearchResult record =
+-- encodeSearch : Search -> Json.Encode.Value
+-- encodeSearch record =
 --     Json.Encode.object
 --         [ ("kind",  Json.Encode.string <| record.kind)
 --         , ("etag",  Json.Encode.string <| record.etag)
---         , ("id",  encodeSearchResultId <| record.id)
---         , ("snippet",  encodeSearchResultSnippet <| record.snippet)
+--         , ("nextPageToken",  Json.Encode.string <| record.nextPageToken)
+--         , ("regionCode",  Json.Encode.string <| record.regionCode)
+--         , ("pageInfo",  encodeSearchPageInfo <| record.pageInfo)
+--         , ("items",  Json.Encode.list <| List.map encodeSearchResultItem <| record.items)
 --         ]
 
--- encodeSearchResultId : SearchResultId -> Json.Encode.Value
--- encodeSearchResultId record =
+-- encodeSearchPageInfo : SearchPageInfo -> Json.Encode.Value
+-- encodeSearchPageInfo record =
+--     Json.Encode.object
+--         [ ("totalResults",  Json.Encode.int <| record.totalResults)
+--         , ("resultsPerPage",  Json.Encode.int <| record.resultsPerPage)
+--         ]
+
+-- encodeSearchResultItem : SearchResultItem -> Json.Encode.Value
+-- encodeSearchResultItem record =
+--     Json.Encode.object
+--         [ ("kind",  Json.Encode.string <| record.kind)
+--         , ("etag",  Json.Encode.string <| record.etag)
+--         , ("id",  encodeSearchResultItemId <| record.id)
+--         , ("snippet",  encodeSearchResultItemSnippet <| record.snippet)
+--         ]
+
+-- encodeSearchResultItemId : SearchResultItemId -> Json.Encode.Value
+-- encodeSearchResultItemId record =
 --     Json.Encode.object
 --         [ ("kind",  Json.Encode.string <| record.kind)
 --         , ("channelId",  Json.Encode.string <| record.channelId)
 --         ]
 
--- encodeSearchResultSnippetThumbnailsDefault : SearchResultSnippetThumbnailsDefault -> Json.Encode.Value
--- encodeSearchResultSnippetThumbnailsDefault record =
+-- encodeSearchResultItemSnippetThumbnailsDefault : SearchResultItemSnippetThumbnailsDefault -> Json.Encode.Value
+-- encodeSearchResultItemSnippetThumbnailsDefault record =
 --     Json.Encode.object
 --         [ ("url",  Json.Encode.string <| record.url)
 --         ]
 
--- encodeSearchResultSnippetThumbnailsMedium : SearchResultSnippetThumbnailsMedium -> Json.Encode.Value
--- encodeSearchResultSnippetThumbnailsMedium record =
+-- encodeSearchResultItemSnippetThumbnailsMedium : SearchResultItemSnippetThumbnailsMedium -> Json.Encode.Value
+-- encodeSearchResultItemSnippetThumbnailsMedium record =
 --     Json.Encode.object
 --         [ ("url",  Json.Encode.string <| record.url)
 --         ]
 
--- encodeSearchResultSnippetThumbnailsHigh : SearchResultSnippetThumbnailsHigh -> Json.Encode.Value
--- encodeSearchResultSnippetThumbnailsHigh record =
+-- encodeSearchResultItemSnippetThumbnailsHigh : SearchResultItemSnippetThumbnailsHigh -> Json.Encode.Value
+-- encodeSearchResultItemSnippetThumbnailsHigh record =
 --     Json.Encode.object
 --         [ ("url",  Json.Encode.string <| record.url)
 --         ]
 
--- encodeSearchResultSnippetThumbnails : SearchResultSnippetThumbnails -> Json.Encode.Value
--- encodeSearchResultSnippetThumbnails record =
+-- encodeSearchResultItemSnippetThumbnails : SearchResultItemSnippetThumbnails -> Json.Encode.Value
+-- encodeSearchResultItemSnippetThumbnails record =
 --     Json.Encode.object
---         [ ("default",  encodeSearchResultSnippetThumbnailsDefault <| record.default)
---         , ("medium",  encodeSearchResultSnippetThumbnailsMedium <| record.medium)
---         , ("high",  encodeSearchResultSnippetThumbnailsHigh <| record.high)
+--         [ ("default",  encodeSearchResultItemSnippetThumbnailsDefault <| record.default)
+--         , ("medium",  encodeSearchResultItemSnippetThumbnailsMedium <| record.medium)
+--         , ("high",  encodeSearchResultItemSnippetThumbnailsHigh <| record.high)
 --         ]
 
--- encodeSearchResultSnippet : SearchResultSnippet -> Json.Encode.Value
--- encodeSearchResultSnippet record =
+-- encodeSearchResultItemSnippet : SearchResultItemSnippet -> Json.Encode.Value
+-- encodeSearchResultItemSnippet record =
 --     Json.Encode.object
 --         [ ("publishedAt",  Json.Encode.string <| record.publishedAt)
 --         , ("channelId",  Json.Encode.string <| record.channelId)
 --         , ("title",  Json.Encode.string <| record.title)
 --         , ("description",  Json.Encode.string <| record.description)
---         , ("thumbnails",  encodeSearchResultSnippetThumbnails <| record.thumbnails)
+--         , ("thumbnails",  encodeSearchResultItemSnippetThumbnails <| record.thumbnails)
 --         , ("channelTitle",  Json.Encode.string <| record.channelTitle)
 --         , ("liveBroadcastContent",  Json.Encode.string <| record.liveBroadcastContent)
 --         ]

@@ -15,7 +15,7 @@ import Api.TicketMaster as TicketMaster
 root : Model -> Html Msg
 root model =
     div []
-        [ tmdata model.data
+        [ tmdata model.events
         ]
 
 

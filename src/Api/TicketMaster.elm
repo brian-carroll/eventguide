@@ -1,10 +1,24 @@
 module Api.TicketMaster exposing (..)
 
-import Json.Decode exposing (Decoder, string, bool, list, tuple2, int, maybe, (:=))
+import Json.Decode exposing (Decoder, string, bool, list, int, maybe, (:=), map)
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Date exposing (Date)
 import String
 import List
+import Http
+
+
+-- https://app.ticketmaster.com/discovery/v2/events.json?city=london&countryCode=gb&classificationName=music{&page,size,sort}&apikey=NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu
+searchUrl : List (String, String) -> String
+searchUrl params =
+    let
+        query =
+            ( "apikey", "NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu" ) :: params
+    in
+        Http.url "https://app.ticketmaster.com/discovery/v2/events.json" query
+
+
+-------------------------------------------------
 
 
 type alias Response =
@@ -45,10 +59,18 @@ pageDecoder =
 -------------------------------------------------
 
 
+type alias EventId =
+    String
+
+eventIdDecoder : Decoder EventId
+eventIdDecoder =
+    string
+
+
 type alias Event =
     { name : String
     , type' : String
-    , id : String
+    , id : EventId
     , test : Bool
     , url : String
     , locale : String
@@ -69,7 +91,7 @@ eventDecoder =
     decode Event
         |> required "name" string
         |> required "type" string
-        |> required "id" string
+        |> required "id" eventIdDecoder
         |> required "test" bool
         |> required "url" string
         |> required "locale" string

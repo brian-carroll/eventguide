@@ -10,40 +10,16 @@ module Main exposing (main)
 import TimeTravel.Html.App as App
 import Task
 import Http
+import Dict
+import Platform.Cmd exposing (Cmd)
 
 
 -- Local modules
 
 import Api.TicketMaster as TicketMaster
+import Api.YouTube as YouTube
 import Types exposing (..)
 import View
-
-
-fetchEvents : Cmd Msg
-fetchEvents =
-    Http.get TicketMaster.responseDecoder searchUrl
-        |> Task.perform SearchFail SearchDone
-
-
-searchUrl : String
-searchUrl =
-    -- "/tests/Data/ticketmaster.json"
-    "https://app.ticketmaster.com/discovery/v2/events.json?city=london&countryCode=gb&classificationName=music{&page,size,sort}&apikey=NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu"
-
-
-init : ( Model, Cmd Msg )
-init =
-    ( { data = Loading }, fetchEvents )
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        SearchFail e ->
-            ( { data = Failure e }, Cmd.none )
-
-        SearchDone response ->
-            ( { data = Success response }, Cmd.none )
 
 
 {-| Entry point for the app
@@ -56,3 +32,80 @@ main =
         , subscriptions = (\_ -> Sub.none)
         , view = View.root
         }
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( { events = Loading, videos = Dict.empty }
+    , fetchEvents
+    )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        SearchFail e ->
+            ( { model
+                | events =
+                    Failure e
+              }
+            , Cmd.none
+            )
+
+        SearchDone response ->
+            ( { model
+                | events =
+                    Success response
+              }
+            , Cmd.batch (generateVideoQueries response)
+            )
+
+        YouTubeSuccess eventId youtubeSearchResult ->
+            ( { model
+                | videos =
+                    Dict.insert eventId (Success youtubeSearchResult) model.videos
+              }
+            , Cmd.none
+            )
+
+        YouTubeFail eventId e ->
+            ( { model
+                | videos =
+                    Dict.insert eventId (Failure e) model.videos
+              }
+            , Cmd.none
+            )
+
+
+fetchEvents : Cmd Msg
+fetchEvents =
+    let
+        params =
+            [ ( "city", "london" )
+            , ( "countryCode", "gb" )
+            , ( "classificationName", "music" )
+            ]
+    in
+        Http.get TicketMaster.responseDecoder (TicketMaster.searchUrl params)
+            |> Task.perform SearchFail SearchDone
+
+
+generateVideoQueries : TicketMaster.Response -> List (Cmd Msg)
+generateVideoQueries response =
+    response.events
+        |> List.map (\e -> fetchVideos ( e.id, e.name ))
+
+
+fetchVideos : ( TicketMaster.EventId, String ) -> Cmd Msg
+fetchVideos ( eventId, searchTerm ) =
+    let
+        genFailMsg : Http.Error -> Msg
+        genFailMsg err =
+            YouTubeFail eventId err
+
+        genSuccessMsg : YouTube.SearchResult -> Msg
+        genSuccessMsg result =
+            YouTubeSuccess eventId result
+    in
+        Http.get YouTube.decodeSearchResult (YouTube.searchUrl searchTerm)
+            |> Task.perform genFailMsg genSuccessMsg
