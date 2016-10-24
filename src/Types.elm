@@ -3,14 +3,13 @@ module Types exposing (..)
 import Http
 import Api.TicketMaster as TicketMaster
 import Api.YouTube as YouTube
-import Dict exposing (Dict)
 
 
 type Msg
     = SearchDone TicketMaster.Response
     | SearchFail Http.Error
-    | YouTubeSuccess TicketMaster.EventId YouTube.SearchResult
-    | YouTubeFail TicketMaster.EventId Http.Error
+    | YouTubeSuccess Int YouTube.SearchResult
+    | YouTubeFail Int Http.Error
 
 
 type RemoteData e a
@@ -26,5 +25,5 @@ type alias WebData a =
 
 type alias Model =
     { events : WebData TicketMaster.Response
-    , videos : Dict TicketMaster.EventId (WebData YouTube.SearchResult)
+    , videos : List (WebData YouTube.SearchResult)
     }

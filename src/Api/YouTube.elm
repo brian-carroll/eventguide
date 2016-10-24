@@ -7,6 +7,9 @@ module Api.YouTube exposing (..)
 import Json.Decode exposing (Decoder, string, list, int, object1, fail, andThen, (:=))
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Http
+import String
+import Maybe
+
 
 
 apiKey : String
@@ -21,6 +24,21 @@ searchUrl searchTerm =
         , ("q", (Http.uriEncode searchTerm))
         , ("key", apiKey)
         ]
+
+getFirstEmbedUrl : SearchResult -> Maybe String
+getFirstEmbedUrl searchResult =
+    let
+        getVideoId item =
+            case item.id of
+                Video id ->
+                    Just id
+                _ ->
+                    Nothing
+    in
+        searchResult.items
+            |> List.filterMap getVideoId
+            |> List.head
+            |> Maybe.map (String.append "https://www.youtube.com/embed/")
 
 
 type alias SearchResult =
@@ -75,7 +93,7 @@ decodeSearchResult =
     decode SearchResult
         |> required "kind" (string)
         |> required "etag" (string)
-        |> required "nextPageToken" (string)
+        |> optional "nextPageToken" (string) ""
         |> required "regionCode" (string)
         |> required "pageInfo" (decodeSearchPageInfo)
         |> required "items" (list decodeSearchResultItem)

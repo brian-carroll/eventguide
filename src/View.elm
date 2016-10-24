@@ -10,18 +10,20 @@ import Html.Attributes exposing (..)
 
 import Types exposing (..)
 import Api.TicketMaster as TicketMaster
+import Api.YouTube as YouTube
 
 
 root : Model -> Html Msg
 root model =
     div []
-        [ tmdata model.events
+        [ h1 [] [text "Brian's Event Guide"]
+        , eventList model
         ]
 
 
-tmdata : WebData { a | events : List TicketMaster.Event } -> Html Msg
-tmdata webdata =
-    case webdata of
+eventList : Model -> Html Msg
+eventList model =
+    case model.events of
         NotAsked ->
             text "Request not sent yet"
 
@@ -33,29 +35,35 @@ tmdata webdata =
 
         Success data ->
             div [ class "container-fluid" ]
-                (List.map tmevent data.events)
+                (List.map2 event data.events model.videos)
 
 
-tmevent : TicketMaster.Event -> Html Msg
-tmevent event =
+event : TicketMaster.Event -> (WebData YouTube.SearchResult) -> Html Msg
+event ev video =
     div [ class "row" ]
-        [ a [ href event.url ]
-            [ h3 []
-                [ text event.name ]
+        [ a [ href ev.url ]
+            [ h3 [] [ text ev.name ]
             ]
         , div [ class "row" ]
-            [ div [ class "col-md-6" ]
-                [ img [ src (getEventImageUrl event) ] []
+            [ div [ class "col-md-4" ]
+                [ img [ src (eventImageUrl ev) ] []
                 ]
-            , div [ class "col-md-6" ]
-                [ img [ src (getEventImageUrl event) ] []
+            , div [ class "col-md-8" ]
+                [ iframe
+                    [ src (eventVideoUrl video)
+                    , width 205
+                    , height 115
+                    , attribute "frameborder" "0"
+                    , attribute "allowfullscreen" ""
+                    ]
+                    []
                 ]
             ]
         ]
 
 
-getEventImageUrl : TicketMaster.Event -> String
-getEventImageUrl event =
+eventImageUrl : TicketMaster.Event -> String
+eventImageUrl event =
     let
         ratio =
             ( 16, 9 )
@@ -64,3 +72,17 @@ getEventImageUrl event =
             115
     in
         TicketMaster.selectImageUrl ratio height event.images
+
+
+eventVideoUrl : WebData YouTube.SearchResult -> String
+eventVideoUrl webData =
+    let
+        firstEmbedUrl : Maybe String
+        firstEmbedUrl =
+            case webData of
+                Success searchResult ->
+                    YouTube.getFirstEmbedUrl searchResult
+                _ ->
+                    Nothing
+    in
+        Maybe.withDefault "" firstEmbedUrl

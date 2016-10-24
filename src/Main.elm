@@ -36,7 +36,7 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { events = Loading, videos = Dict.empty }
+    ( { events = Loading, videos = [] }
     , fetchEvents
     )
 
@@ -53,59 +53,69 @@ update msg model =
             )
 
         SearchDone response ->
-            ( { model
-                | events =
-                    Success response
+            ( { events = Success response
+              , videos = List.repeat (List.length response.events) Loading
               }
             , Cmd.batch (generateVideoQueries response)
             )
 
-        YouTubeSuccess eventId youtubeSearchResult ->
+        YouTubeFail index err ->
             ( { model
                 | videos =
-                    Dict.insert eventId (Success youtubeSearchResult) model.videos
+                    listReplace index (Failure err) model.videos
               }
             , Cmd.none
             )
 
-        YouTubeFail eventId e ->
+        YouTubeSuccess index youtubeSearchResult ->
             ( { model
                 | videos =
-                    Dict.insert eventId (Failure e) model.videos
+                    listReplace index (Success youtubeSearchResult) model.videos
               }
             , Cmd.none
             )
+
+
+listReplace : Int -> a -> List a -> List a
+listReplace index item list =
+    List.concat
+        [ List.take index list
+        , [ item ]
+        , List.drop (index + 1) list
+        ]
 
 
 fetchEvents : Cmd Msg
 fetchEvents =
     let
-        params =
-            [ ( "city", "london" )
-            , ( "countryCode", "gb" )
-            , ( "classificationName", "music" )
-            ]
+        url =
+            TicketMaster.searchUrl
+                [ ( "city", "london" )
+                , ( "countryCode", "gb" )
+                , ( "size", toString 10 )
+                , ( "classificationName", "music" )
+                ]
     in
-        Http.get TicketMaster.responseDecoder (TicketMaster.searchUrl params)
+        Http.get TicketMaster.responseDecoder url
             |> Task.perform SearchFail SearchDone
 
 
 generateVideoQueries : TicketMaster.Response -> List (Cmd Msg)
 generateVideoQueries response =
     response.events
-        |> List.map (\e -> fetchVideos ( e.id, e.name ))
+        |> List.indexedMap (\index event -> fetchVideos index event.name)
 
 
-fetchVideos : ( TicketMaster.EventId, String ) -> Cmd Msg
-fetchVideos ( eventId, searchTerm ) =
+fetchVideos : Int -> String -> Cmd Msg
+fetchVideos index searchTerm =
     let
         genFailMsg : Http.Error -> Msg
         genFailMsg err =
-            YouTubeFail eventId err
+            YouTubeFail index err
 
         genSuccessMsg : YouTube.SearchResult -> Msg
         genSuccessMsg result =
-            YouTubeSuccess eventId result
+            YouTubeSuccess index result
     in
         Http.get YouTube.decodeSearchResult (YouTube.searchUrl searchTerm)
             |> Task.perform genFailMsg genSuccessMsg
