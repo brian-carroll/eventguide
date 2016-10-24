@@ -4,13 +4,12 @@ module View exposing (root)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Maybe
 
 
 -- Local modules
 
 import Types exposing (..)
-import TicketMaster
+import Api.TicketMaster as TicketMaster
 
 
 root : Model -> Html Msg

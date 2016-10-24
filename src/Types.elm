@@ -1,7 +1,7 @@
 module Types exposing (..)
 
 import Http
-import TicketMaster
+import Api.TicketMaster as TicketMaster
 
 
 type Msg

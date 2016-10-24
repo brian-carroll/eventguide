@@ -14,7 +14,7 @@ import Http
 
 -- Local modules
 
-import TicketMaster
+import Api.TicketMaster as TicketMaster
 import Types exposing (..)
 import View
 

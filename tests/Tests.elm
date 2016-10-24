@@ -2,7 +2,7 @@ module Tests exposing (all)
 
 import Test exposing (Test, describe, test)
 import Expect exposing (true)
-import TicketMaster
+import Api.TicketMaster as TicketMaster
 import Json.Decode
 
 import Data.EventExample as EventExample

@@ -1,4 +1,4 @@
-module TicketMaster exposing (..)
+module Api.TicketMaster exposing (..)
 
 import Json.Decode exposing (Decoder, string, bool, list, tuple2, int, maybe, (:=))
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
