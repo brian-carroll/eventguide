@@ -14,7 +14,8 @@
   "scripts": {
     "clean": "rm -rf tests/elm-stuff/build-artifacts/*/user ; rm -rf elm-stuff/build-artifacts/*/user",
     "test": "npm run clean ; elm test",
-    "build": "elm make src/Main.elm --output assets/js/elm.js"
+    "build": "rm -rf assets/js/elm.* && elm make src/Main.elm --output assets/js/elm.js",
+    "compress": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --language_in ECMASCRIPT5 --js assets/js/elm.js > assets/js/elm.min.js && gzip -fk assets/js/elm.min.js && ls -lh assets/js"
   },
   "author": "",
   "license": "ISC"

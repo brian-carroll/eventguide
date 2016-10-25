@@ -5,9 +5,9 @@ module Main exposing (main)
 -}
 
 -- External modules
---import Html.App as App
+import Html.App as App
 
-import TimeTravel.Html.App as App
+-- import TimeTravel.Html.App as App
 import Task
 import Http
 import Platform.Cmd exposing (Cmd)
