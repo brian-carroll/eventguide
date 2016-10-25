@@ -15,23 +15,23 @@ apiParams =
 
     ---- Useful user inputs ----
 
-    , "keyword" -- A string to search against event's name. Partial word will not be found. ex:keyword=Mado will not found event with name: Madonna
+    , "keyword" -- A string to search against event's name. Partial word will not be found. ex:keyword=Mado will not find event with name: Madonna
     , "startDateTime" -- Include events happening after this date. Default=2017-01-01T00:00:00Z
     , "endDateTime" -- Include events happening before this date. Default=2017-01-01T00:00:00Z
 
     , "city" -- city
-    , "countryCode" -- ISO value. Possible values are: 'US', 'CA', 'AU', 'NZ', 'MX'. Default=MX
-
-    , "latlong" -- The Latitude, Longitude coordinates for venue Default=34.0928090,-118.3286610
     , "radius" -- The radius of the area in which we want to search for events. Default=25
     , "unit" -- The radius distance unit. Possible values: miles, km. Default=miles
 
 
     ---- Fixed or hidden values ----
 
+    , "countryCode" -- ISO value. Possible values are: 'US', 'CA', 'AU', 'NZ', 'MX'. Default=MX
+    , "latlong" -- The Latitude, Longitude coordinates for venue Default=34.0928090,-118.3286610
+
     , "size" -- The number of events returned in the API response. (Max 500) Default=10
     , "page" -- The page for paginating through the results. Default=1
-    , "sort" -- Values: "", eventDate,date.desc, eventDate,date.asc, name,date.desc, name,date.asc.
+    , "sort" -- Values: "", "eventDate,date.desc", "eventDate,date.asc", "name,date.desc", "name,date.asc".
 
     , "source" -- Source of the event. Possible values are 'ticketmaster', 'frontgate', 'universe'. Default=ticketmaster
 

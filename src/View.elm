@@ -40,9 +40,9 @@ eventList model =
 
 event : TicketMaster.Event -> (WebData YouTube.SearchResult) -> Html Msg
 event ev video =
-    div [ class "row" ]
+    div [ class "row event" ]
         [ h3 [] [ text ev.name ]
-        , div [ class "row" ]
+        , div [ class "row well" ]
             [ div [ class "col-md-4" ]
                 [ img [ src (eventImageUrl ev) ] []
                 ]
