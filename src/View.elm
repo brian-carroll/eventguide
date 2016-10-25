@@ -15,7 +15,7 @@ import Api.YouTube as YouTube
 
 root : Model -> Html Msg
 root model =
-    div []
+    div [ class "container" ]
         [ h1 [] [text "Brian's Event Guide"]
         , eventList model
         ]
@@ -34,21 +34,21 @@ eventList model =
             text (toString error)
 
         Success data ->
-            div [ class "container-fluid" ]
+            div []
                 (List.map2 event data.events model.videos)
 
 
 event : TicketMaster.Event -> (WebData YouTube.SearchResult) -> Html Msg
 event ev video =
     div [ class "row" ]
-        [ a [ href ev.url ]
-            [ h3 [] [ text ev.name ]
-            ]
+        [ h3 [] [ text ev.name ]
         , div [ class "row" ]
             [ div [ class "col-md-4" ]
                 [ img [ src (eventImageUrl ev) ] []
                 ]
-            , div [ class "col-md-8" ]
+            , div [ class "col-md-4" ]
+                (eventDetails ev)
+            , div [ class "col-md-4" ]
                 [ iframe
                     [ src (eventVideoUrl video)
                     , width 205
@@ -60,6 +60,27 @@ event ev video =
                 ]
             ]
         ]
+
+
+eventDetails : TicketMaster.Event -> List (Html Msg)
+eventDetails event =
+    [ div [ class "row" ]
+        [ text (event.dates.start.localDate ++ " " ++ event.dates.start.localTime)
+        ]
+    , div [ class "row" ]
+        (List.map venueLink event.embedded.venues)
+    , div [ class "row" ]
+        [ a [ class "btn btn-default", href event.url, target "_blank" ]
+            [ text "Buy Now" 
+            ]
+        ]
+    ]
+
+
+venueLink : TicketMaster.Venue -> Html Msg
+venueLink venue =
+    a [ href venue.url, target "_blank" ]
+        [ text venue.name ]
 
 
 eventImageUrl : TicketMaster.Event -> String

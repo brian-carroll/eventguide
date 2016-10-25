@@ -10,7 +10,6 @@ module Main exposing (main)
 import TimeTravel.Html.App as App
 import Task
 import Http
-import Dict
 import Platform.Cmd exposing (Cmd)
 
 
