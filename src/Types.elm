@@ -3,10 +3,14 @@ module Types exposing (..)
 import Http
 import Api.TicketMaster as TicketMaster
 import Api.YouTube as YouTube
+import Time
+import ISO8601
 
 
 type Msg
-    = SearchDone TicketMaster.Response
+    = Init Time.Time
+    | InitFail String  -- Getting Date can't fail, so this won't happen
+    | SearchDone TicketMaster.Response
     | SearchFail Http.Error
     | YouTubeSuccess Int YouTube.SearchResult
     | YouTubeFail Int Http.Error
@@ -26,4 +30,5 @@ type alias WebData a =
 type alias Model =
     { events : WebData TicketMaster.Response
     , videos : List (WebData YouTube.SearchResult)
+    , today : ISO8601.Time
     }

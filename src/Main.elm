@@ -5,12 +5,14 @@ module Main exposing (main)
 -}
 
 -- External modules
-import Html.App as App
+-- import Html.App as App
+import TimeTravel.Html.App as App
 
--- import TimeTravel.Html.App as App
 import Task
 import Http
 import Platform.Cmd exposing (Cmd)
+import ISO8601
+import Time
 
 
 -- Local modules
@@ -35,14 +37,23 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { events = Loading, videos = [] }
-    , fetchEvents
+    ( { events = Loading, videos = [], today = ISO8601.fromTime 0 }
+    , Task.perform InitFail Init Time.now
     )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Init now ->
+            let
+                t =
+                    ISO8601.fromTime (1000 * round (now/1000))
+            in
+                ( { model | today = t }
+                , fetchEvents t
+                )
+
         SearchFail e ->
             ( { model
                 | events =
@@ -54,6 +65,7 @@ update msg model =
         SearchDone response ->
             ( { events = Success response
               , videos = List.repeat (List.length response.events) Loading
+              , today = model.today
               }
             , Cmd.batch (generateVideoQueries response)
             )
@@ -74,6 +86,9 @@ update msg model =
             , Cmd.none
             )
 
+        _ ->
+            ( model, Cmd.none )
+
 
 listReplace : Int -> a -> List a -> List a
 listReplace index item list =
@@ -84,15 +99,26 @@ listReplace index item list =
         ]
 
 
-fetchEvents : Cmd Msg
-fetchEvents =
+fetchEvents : ISO8601.Time -> Cmd Msg
+fetchEvents today =
     let
+        days =
+            14
+
+        endDateTime =
+            today
+                |> ISO8601.toTime
+                |> (+) ( days * 24 * round Time.hour )
+                |> ISO8601.fromTime
+
         url =
             TicketMaster.searchUrl
                 [ ( "city", "london" )
                 , ( "countryCode", "gb" )
                 , ( "size", toString 10 )
                 , ( "classificationName", "music" )
+                , ( "startDateTime", ISO8601.toString today )
+                , ( "endDateTime", ISO8601.toString endDateTime )
                 ]
     in
         Http.get TicketMaster.responseDecoder url
