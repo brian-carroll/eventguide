@@ -48,7 +48,7 @@ update msg model =
         Init now ->
             let
                 t =
-                    ISO8601.fromTime (1000 * round (now/1000))
+                    ISO8601.fromTime (1000 * round (now / 1000))
             in
                 ( { model | today = t }
                 , fetchEvents t
@@ -108,7 +108,7 @@ fetchEvents today =
         endDateTime =
             today
                 |> ISO8601.toTime
-                |> (+) ( days * 24 * round Time.hour )
+                |> (+) (days * 24 * round Time.hour)
                 |> ISO8601.fromTime
 
         url =

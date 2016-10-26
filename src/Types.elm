@@ -9,7 +9,7 @@ import ISO8601
 
 type Msg
     = Init Time.Time
-    | InitFail String  -- Getting Date can't fail, so this won't happen
+    | InitFail String
     | SearchDone TicketMaster.Response
     | SearchFail Http.Error
     | YouTubeSuccess Int YouTube.SearchResult

@@ -10,59 +10,80 @@ import Http
 
 apiParams : List String
 apiParams =
-    [ "apikey" -- API authorization key
-
-
-    ---- Useful user inputs ----
-
-    , "keyword" -- A string to search against event's name. Partial word will not be found. ex:keyword=Mado will not find event with name: Madonna
-    , "startDateTime" -- Include events happening after this date. Default=2017-01-01T00:00:00Z
-    , "endDateTime" -- Include events happening before this date. Default=2017-01-01T00:00:00Z
-
-    , "city" -- city
-    , "radius" -- The radius of the area in which we want to search for events. Default=25
-    , "unit" -- The radius distance unit. Possible values: miles, km. Default=miles
-
-
-    ---- Fixed or hidden values ----
-
-    , "countryCode" -- ISO value. Possible values are: 'US', 'CA', 'AU', 'NZ', 'MX'. Default=MX
-    , "latlong" -- The Latitude, Longitude coordinates for venue Default=34.0928090,-118.3286610
-
-    , "size" -- The number of events returned in the API response. (Max 500) Default=10
-    , "page" -- The page for paginating through the results. Default=1
-    , "sort" -- Values: "", "eventDate,date.desc", "eventDate,date.asc", "name,date.desc", "name,date.asc".
-
-    , "source" -- Source of the event. Possible values are 'ticketmaster', 'frontgate', 'universe'. Default=ticketmaster
-
-    , "onsaleStartDateTime" -- Include events going onsale after this date. Default=2017-01-01T00:00:00Z
-    , "onsaleEndDateTime" -- Include events going onsale before this date. Default=2017-01-01T00:00:00Z
-
-
-    ---- Less-useful stuff ----
-
-    , "attractionId" -- Attraction ID(s) separated by comma. Default=K8vZ91713eV
-    , "venueId" -- Venue ID(s) separated by comma. Default=KovZpZAEdFtJ
-    , "locale" -- There is no fallback mechanism, so it's possible you will not have values in multi-lingual fields
-    , "marketId" -- The city/metro area in which this event takes place. Default=27
-    , "includeTBA" -- Whether or not to return events with dates to be announced (TBA). yes|no|only Default=no
-    , "includeTBD" -- Whether or not to return events with dates to be determined (TBD). yes|no|only  Default=no
-    , "includeTest" -- Whether or not to return test events. Yes|no|only Default=no
-    , "stateCode" -- stateCode
-    , "classificationName" -- any classification name - segment - genre - sub-genre
-    , "classificationId" -- any classification id - segment - genre - sub-genre
-    , "dmaId" -- dmaId
-    , "postalCode" -- Zipcode or Postal Code of the venue in which the event is taking place. This is text-based search, not location-based search. Use lat/long + radius search for nearby events. Default=90069
+    [ "apikey"
+      -- API authorization key
+      --
+      ---- Useful user inputs ----
+      --
+    , "keyword"
+      -- A string to search against event's name. Partial word will not be found. ex:keyword=Mado will not find event with name: Madonna
+    , "startDateTime"
+      -- Include events happening after this date. Default=2017-01-01T00:00:00Z
+    , "endDateTime"
+      -- Include events happening before this date. Default=2017-01-01T00:00:00Z
+    , "city"
+      -- city
+    , "radius"
+      -- The radius of the area in which we want to search for events. Default=25
+    , "unit"
+      -- The radius distance unit. Possible values: miles, km. Default=miles
+      --
+      ---- Fixed or hidden values ----
+      --
+    , "countryCode"
+      -- ISO value. Possible values are: 'US', 'CA', 'AU', 'NZ', 'MX'. Default=MX
+    , "latlong"
+      -- The Latitude, Longitude coordinates for venue Default=34.0928090,-118.3286610
+    , "size"
+      -- The number of events returned in the API response. (Max 500) Default=10
+    , "page"
+      -- The page for paginating through the results. Default=1
+    , "sort"
+      -- Values: "", "eventDate,date.desc", "eventDate,date.asc", "name,date.desc", "name,date.asc".
+    , "source"
+      -- Source of the event. Possible values are 'ticketmaster', 'frontgate', 'universe'. Default=ticketmaster
+    , "onsaleStartDateTime"
+      -- Include events going onsale after this date. Default=2017-01-01T00:00:00Z
+    , "onsaleEndDateTime"
+      -- Include events going onsale before this date. Default=2017-01-01T00:00:00Z
+      --
+      ---- Less-useful stuff ----
+      --
+    , "attractionId"
+      -- Attraction ID(s) separated by comma. Default=K8vZ91713eV
+    , "venueId"
+      -- Venue ID(s) separated by comma. Default=KovZpZAEdFtJ
+    , "locale"
+      -- There is no fallback mechanism, so it's possible you will not have values in multi-lingual fields
+    , "marketId"
+      -- The city/metro area in which this event takes place. Default=27
+    , "includeTBA"
+      -- Whether or not to return events with dates to be announced (TBA). yes|no|only Default=no
+    , "includeTBD"
+      -- Whether or not to return events with dates to be determined (TBD). yes|no|only  Default=no
+    , "includeTest"
+      -- Whether or not to return test events. Yes|no|only Default=no
+    , "stateCode"
+      -- stateCode
+    , "classificationName"
+      -- any classification name - segment - genre - sub-genre
+    , "classificationId"
+      -- any classification id - segment - genre - sub-genre
+    , "dmaId"
+      -- dmaId
+    , "postalCode"
+      -- Zipcode or Postal Code of the venue in which the event is taking place. This is text-based search, not location-based search. Use lat/long + radius search for nearby events. Default=90069
     ]
 
 
-searchUrl : List (String, String) -> String
+searchUrl : List ( String, String ) -> String
 searchUrl params =
     let
         query =
             ( "apikey", "NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu" ) :: params
     in
         Http.url "https://app.ticketmaster.com/discovery/v2/events.json" query
+
 
 
 -------------------------------------------------
@@ -108,6 +129,7 @@ pageDecoder =
 
 type alias EventId =
     String
+
 
 eventIdDecoder : Decoder EventId
 eventIdDecoder =

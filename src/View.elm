@@ -16,7 +16,7 @@ import Api.YouTube as YouTube
 root : Model -> Html Msg
 root model =
     div [ class "container" ]
-        [ h1 [] [text "Brian's Event Guide"]
+        [ h1 [] [ text "Brian's Event Guide" ]
         , eventList model
         ]
 
@@ -38,7 +38,7 @@ eventList model =
                 (List.map2 event data.events model.videos)
 
 
-event : TicketMaster.Event -> (WebData YouTube.SearchResult) -> Html Msg
+event : TicketMaster.Event -> WebData YouTube.SearchResult -> Html Msg
 event ev video =
     div [ class "row event" ]
         [ h3 [] [ text ev.name ]
@@ -71,7 +71,7 @@ eventDetails event =
         (List.map venueLink event.embedded.venues)
     , div [ class "row" ]
         [ a [ class "btn btn-default", href event.url, target "_blank" ]
-            [ text "Buy Now" 
+            [ text "Buy Now"
             ]
         ]
     ]
@@ -103,6 +103,7 @@ eventVideoUrl webData =
             case webData of
                 Success searchResult ->
                     YouTube.getFirstEmbedUrl searchResult
+
                 _ ->
                     Nothing
     in
