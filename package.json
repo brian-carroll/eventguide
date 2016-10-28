@@ -6,16 +6,15 @@
   "directories": {
     "test": "tests"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "elm-test": "^0.17.3"
   },
   "scripts": {
     "clean": "rm -rf tests/elm-stuff/build-artifacts/*/user ; rm -rf elm-stuff/build-artifacts/*/user",
     "test": "npm run clean ; elm test",
-    "build": "rm -rf assets/js/elm.* && elm make src/Main.elm --output assets/js/elm.js",
-    "compress": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --language_in ECMASCRIPT5 --js assets/js/elm.js > assets/js/elm.min.js && gzip -fk assets/js/elm.min.js && ls -lh assets/js"
+    "build": "rm -rf dist/js/elm.* && elm make src/Main.elm --output dist/js/elm.js && rsync -ai --delete assets/css/ dist/css/",
+    "compress": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --language_in ECMASCRIPT5 --js dist/js/elm.js > dist/js/elm.min.js && gzip -fk dist/*s/* && ls -lhS dist/*s"
   },
   "author": "",
   "license": "ISC"
