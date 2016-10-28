@@ -14,6 +14,8 @@ type Msg
     | SearchFail Http.Error
     | YouTubeSuccess Int YouTube.SearchResult
     | YouTubeFail Int Http.Error
+    | ChangeStartDate String
+    | ChangeEndDate String
 
 
 type RemoteData e a
@@ -30,5 +32,6 @@ type alias WebData a =
 type alias Model =
     { events : WebData TicketMaster.Response
     , videos : List (WebData YouTube.SearchResult)
-    , today : ISO8601.Time
+    , startDate : ISO8601.Time
+    , endDate : ISO8601.Time
     }

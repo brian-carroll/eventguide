@@ -6,8 +6,8 @@ module Main exposing (main)
 
 -- External modules
 -- import Html.App as App
-import TimeTravel.Html.App as App
 
+import TimeTravel.Html.App as App
 import Task
 import Http
 import Platform.Cmd exposing (Cmd)
@@ -37,7 +37,11 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { events = Loading, videos = [], today = ISO8601.fromTime 0 }
+    ( { events = Loading
+      , videos = []
+      , startDate = ISO8601.fromTime 0
+      , endDate = ISO8601.fromTime 0
+      }
     , Task.perform InitFail Init Time.now
     )
 
@@ -45,14 +49,30 @@ init =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Init now ->
+        Init nowTimeStamp ->
             let
-                t =
-                    ISO8601.fromTime (1000 * round (now / 1000))
+                days =
+                    14
+
+                nowNearestSecond =
+                    (1000 * round (nowTimeStamp / 1000))
+
+                start =
+                    ISO8601.fromTime nowNearestSecond
+
+                end =
+                    ISO8601.fromTime (nowNearestSecond + (days * 24 * round Time.hour))
             in
-                ( { model | today = t }
-                , fetchEvents t
+                ( { model
+                    | startDate = start
+                    , endDate = end
+                  }
+                , fetchEvents start end
                 )
+
+        InitFail _ ->
+            -- Never executed, since Time.now always succeeds
+            ( model, Cmd.none )
 
         SearchFail e ->
             ( { model
@@ -63,9 +83,9 @@ update msg model =
             )
 
         SearchDone response ->
-            ( { events = Success response
-              , videos = List.repeat (List.length response.events) Loading
-              , today = model.today
+            ( { model
+                | events = Success response
+                , videos = List.repeat (List.length response.events) Loading
               }
             , Cmd.batch (generateVideoQueries response)
             )
@@ -86,8 +106,25 @@ update msg model =
             , Cmd.none
             )
 
-        _ ->
-            ( model, Cmd.none )
+        ChangeStartDate s ->
+            case ISO8601.fromString s of
+                Ok d ->
+                    ( { model | startDate = d }
+                    , fetchEvents d model.endDate
+                    )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+        ChangeEndDate s ->
+            case ISO8601.fromString s of
+                Ok d ->
+                    ( { model | endDate = d }
+                    , fetchEvents model.startDate d
+                    )
+
+                Err _ ->
+                    ( model, Cmd.none )
 
 
 listReplace : Int -> a -> List a -> List a
@@ -99,26 +136,17 @@ listReplace index item list =
         ]
 
 
-fetchEvents : ISO8601.Time -> Cmd Msg
-fetchEvents today =
+fetchEvents : ISO8601.Time -> ISO8601.Time -> Cmd Msg
+fetchEvents start end =
     let
-        days =
-            14
-
-        endDateTime =
-            today
-                |> ISO8601.toTime
-                |> (+) (days * 24 * round Time.hour)
-                |> ISO8601.fromTime
-
         url =
             TicketMaster.searchUrl
                 [ ( "city", "london" )
                 , ( "countryCode", "gb" )
                 , ( "size", toString 10 )
                 , ( "classificationName", "music" )
-                , ( "startDateTime", ISO8601.toString today )
-                , ( "endDateTime", ISO8601.toString endDateTime )
+                , ( "startDateTime", ISO8601.toString start )
+                , ( "endDateTime", ISO8601.toString end )
                 ]
     in
         Http.get TicketMaster.responseDecoder url

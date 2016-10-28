@@ -4,7 +4,8 @@ module View exposing (root)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-
+import Html.Events exposing (..)
+import ISO8601
 
 -- Local modules
 
@@ -17,7 +18,26 @@ root : Model -> Html Msg
 root model =
     div [ class "container" ]
         [ h1 [] [ text "Brian's Event Guide" ]
+        , inputForm model
         , eventList model
+        ]
+
+
+inputForm : Model -> Html Msg
+inputForm model =
+    div []
+        [ input
+            [ placeholder "Start Date"
+            , value (ISO8601.toString model.startDate)
+            , onInput ChangeStartDate
+            ]
+            []
+        , input
+            [ placeholder "End Date"
+            , value (ISO8601.toString model.endDate)
+            , onInput ChangeEndDate
+            ]
+            []
         ]
 
 
