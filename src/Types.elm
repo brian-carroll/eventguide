@@ -5,6 +5,7 @@ import Api.TicketMaster as TicketMaster
 import Api.YouTube as YouTube
 import Time
 import ISO8601
+import Dict exposing (Dict)
 
 
 type Msg
@@ -12,8 +13,8 @@ type Msg
     | InitFail String
     | SearchDone TicketMaster.Response
     | SearchFail Http.Error
-    | YouTubeSuccess Int YouTube.SearchResult
-    | YouTubeFail Int Http.Error
+    | YouTubeSuccess String YouTube.SearchResult
+    | YouTubeFail String Http.Error
     | ChangeStartDate String
     | ChangeEndDate String
 
@@ -31,7 +32,7 @@ type alias WebData a =
 
 type alias Model =
     { events : WebData TicketMaster.Response
-    , videos : List (WebData YouTube.SearchResult)
+    , videos : Dict String (WebData YouTube.SearchResult)
     , startDate : ISO8601.Time
     , endDate : ISO8601.Time
     }

@@ -6,6 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import ISO8601
+import Dict exposing (Dict)
 
 -- Local modules
 
@@ -55,31 +56,39 @@ eventList model =
 
         Success data ->
             div []
-                (List.map2 event data.events model.videos)
+                (List.map (event model.videos) data.events)
 
 
-event : TicketMaster.Event -> WebData YouTube.SearchResult -> Html Msg
-event ev video =
-    div [ class "row event" ]
-        [ h3 [] [ text ev.name ]
-        , div [ class "row well" ]
-            [ div [ class "col-md-4" ]
-                [ img [ src (eventImageUrl ev) ] []
-                ]
-            , div [ class "col-md-4" ]
-                (eventDetails ev)
-            , div [ class "col-md-4" ]
-                [ iframe
-                    [ src (eventVideoUrl video)
-                    , width 205
-                    , height 115
-                    , attribute "frameborder" "0"
-                    , attribute "allowfullscreen" ""
+event : Dict String (WebData YouTube.SearchResult) -> TicketMaster.Event -> Html Msg
+event videos ev =
+    let
+        videoUrl =
+            case Dict.get ev.name videos of
+                Just video ->
+                    eventVideoUrl video
+                Nothing ->
+                    ""
+    in
+        div [ class "row event" ]
+            [ h3 [] [ text ev.name ]
+            , div [ class "row well" ]
+                [ div [ class "col-md-4" ]
+                    [ img [ src (eventImageUrl ev) ] []
                     ]
-                    []
+                , div [ class "col-md-4" ]
+                    (eventDetails ev)
+                , div [ class "col-md-4" ]
+                    [ iframe
+                        [ src videoUrl
+                        , width 205
+                        , height 115
+                        , attribute "frameborder" "0"
+                        , attribute "allowfullscreen" ""
+                        ]
+                        []
+                    ]
                 ]
             ]
-        ]
 
 
 eventDetails : TicketMaster.Event -> List (Html Msg)

@@ -13,6 +13,7 @@ import Http
 import Platform.Cmd exposing (Cmd)
 import ISO8601
 import Time
+import Dict exposing (Dict)
 
 
 -- Local modules
@@ -38,7 +39,7 @@ main =
 init : ( Model, Cmd Msg )
 init =
     ( { events = Loading
-      , videos = []
+      , videos = Dict.empty
       , startDate = ISO8601.fromTime 0
       , endDate = ISO8601.fromTime 0
       }
@@ -83,28 +84,33 @@ update msg model =
             )
 
         SearchDone response ->
-            ( { model
-                | events = Success response
-                , videos = List.repeat (List.length response.events) Loading
-              }
-            , Cmd.batch (generateVideoQueries response)
-            )
+            let
+                ( updatedVideoDict, fetchVideosCmd ) =
+                    generateVideoQueries response model.videos
+            in
+                ( { model
+                    | events = Success response
+                    , videos = updatedVideoDict
+                }
+                , fetchVideosCmd
+                )
 
-        YouTubeFail index err ->
+        YouTubeFail searchTerm err ->
             ( { model
                 | videos =
-                    listReplace index (Failure err) model.videos
-              }
+                    Dict.insert searchTerm (Failure err) model.videos
+            }
             , Cmd.none
             )
 
-        YouTubeSuccess index youtubeSearchResult ->
+        YouTubeSuccess searchTerm data ->
             ( { model
                 | videos =
-                    listReplace index (Success youtubeSearchResult) model.videos
-              }
+                    Dict.insert searchTerm (Success data) model.videos
+            }
             , Cmd.none
             )
+
 
         ChangeStartDate s ->
             case ISO8601.fromString s of
@@ -127,14 +133,6 @@ update msg model =
                     ( model, Cmd.none )
 
 
-listReplace : Int -> a -> List a -> List a
-listReplace index item list =
-    List.concat
-        [ List.take index list
-        , [ item ]
-        , List.drop (index + 1) list
-        ]
-
 
 fetchEvents : ISO8601.Time -> ISO8601.Time -> Cmd Msg
 fetchEvents start end =
@@ -153,22 +151,37 @@ fetchEvents start end =
             |> Task.perform SearchFail SearchDone
 
 
-generateVideoQueries : TicketMaster.Response -> List (Cmd Msg)
-generateVideoQueries response =
-    response.events
-        |> List.indexedMap (\index event -> fetchVideos index event.name)
+generateVideoQueries : TicketMaster.Response -> Dict String (WebData a) -> (Dict String (WebData a), Cmd Msg)
+generateVideoQueries response videoDict =
+    let
+        newSearchTerms =
+            response.events
+                |> List.map .name
+                |> List.filter (\name -> not (Dict.member name videoDict))
+
+        addLoadingItemToDict : String -> Dict String (WebData a) -> Dict String (WebData a)
+        addLoadingItemToDict searchTerm dict =
+            Dict.insert searchTerm Loading dict
+
+        updatedVideoDict =
+            List.foldl addLoadingItemToDict videoDict newSearchTerms
+
+        command =
+            Platform.Cmd.batch (List.map fetchVideos newSearchTerms)
+    in
+        (updatedVideoDict, command)
 
 
-fetchVideos : Int -> String -> Cmd Msg
-fetchVideos index searchTerm =
+fetchVideos : String -> Cmd Msg
+fetchVideos searchTerm =
     let
         genFailMsg : Http.Error -> Msg
         genFailMsg err =
-            YouTubeFail index err
+            YouTubeFail searchTerm err
 
         genSuccessMsg : YouTube.SearchResult -> Msg
         genSuccessMsg result =
-            YouTubeSuccess index result
+            YouTubeSuccess searchTerm result
     in
         Http.get YouTube.decodeSearchResult (YouTube.searchUrl searchTerm)
             |> Task.perform genFailMsg genSuccessMsg
