@@ -91,7 +91,7 @@ update msg model =
                 ( { model
                     | events = Success response
                     , videos = updatedVideoDict
-                }
+                  }
                 , fetchVideosCmd
                 )
 
@@ -99,7 +99,7 @@ update msg model =
             ( { model
                 | videos =
                     Dict.insert searchTerm (Failure err) model.videos
-            }
+              }
             , Cmd.none
             )
 
@@ -107,10 +107,9 @@ update msg model =
             ( { model
                 | videos =
                     Dict.insert searchTerm (Success data) model.videos
-            }
+              }
             , Cmd.none
             )
-
 
         ChangeStartDate s ->
             case ISO8601.fromString s of
@@ -133,7 +132,6 @@ update msg model =
                     ( model, Cmd.none )
 
 
-
 fetchEvents : ISO8601.Time -> ISO8601.Time -> Cmd Msg
 fetchEvents start end =
     let
@@ -151,7 +149,7 @@ fetchEvents start end =
             |> Task.perform SearchFail SearchDone
 
 
-generateVideoQueries : TicketMaster.Response -> Dict String (WebData a) -> (Dict String (WebData a), Cmd Msg)
+generateVideoQueries : TicketMaster.Response -> Dict String (WebData a) -> ( Dict String (WebData a), Cmd Msg )
 generateVideoQueries response videoDict =
     let
         newSearchTerms =
@@ -169,7 +167,7 @@ generateVideoQueries response videoDict =
         command =
             Platform.Cmd.batch (List.map fetchVideos newSearchTerms)
     in
-        (updatedVideoDict, command)
+        ( updatedVideoDict, command )
 
 
 fetchVideos : String -> Cmd Msg

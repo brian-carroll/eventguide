@@ -547,16 +547,18 @@ selectImageUrl ratio height imageList =
                     EQ ->
                         if currentCoversTarget then
                             -- Big enough to cover the target element => pick the smallest
-                            if currentImage.width < bestImage.width then
+                            (if currentImage.width < bestImage.width then
                                 currentImage
-                            else
+                             else
                                 bestImage
+                            )
                         else
                             -- Too small to cover the target element => pick the biggest
-                            if currentImage.width > bestImage.width then
+                            (if currentImage.width > bestImage.width then
                                 currentImage
-                            else
+                             else
                                 bestImage
+                            )
     in
         case imageList of
             [] ->

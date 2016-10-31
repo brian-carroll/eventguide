@@ -8,6 +8,7 @@ import Html.Events exposing (..)
 import ISO8601
 import Dict exposing (Dict)
 
+
 -- Local modules
 
 import Types exposing (..)
@@ -66,6 +67,7 @@ event videos ev =
             case Dict.get ev.name videos of
                 Just video ->
                     eventVideoUrl video
+
                 Nothing ->
                     ""
     in
