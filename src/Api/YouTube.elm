@@ -125,7 +125,7 @@ decodeSearchResultItem =
 
 decodeSearchResultItemId : Decoder SearchResultItemId
 decodeSearchResultItemId =
-    ("kind" := string) `andThen` idKind
+    ("kind" := string) |> andThen idKind
 
 
 idKind : String -> Decoder SearchResultItemId

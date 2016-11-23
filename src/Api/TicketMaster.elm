@@ -138,7 +138,7 @@ eventIdDecoder =
 
 type alias Event =
     { name : String
-    , type' : String
+    , type_ : String
     , id : EventId
     , test : Bool
     , url : String
@@ -502,7 +502,7 @@ imageRatioDecoder =
 -------------------------------------------------
 
 
-dateDecoder : Decoder (Date.Date)
+dateDecoder : Decoder Date.Date
 dateDecoder =
     Json.Decode.customDecoder string Date.fromString
 
@@ -520,7 +520,7 @@ selectImageUrl : ( Int, Int ) -> Int -> List Image -> String
 selectImageUrl ratio height imageList =
     let
         targetRatio =
-            toFloat (fst ratio) / toFloat (snd ratio)
+            toFloat (Tuple.first ratio) / toFloat (Tuple.second ratio)
 
         width =
             (ceiling ((toFloat height) * targetRatio))
@@ -529,7 +529,7 @@ selectImageUrl ratio height imageList =
         selectBetterOfTwoImages currentImage bestImage =
             let
                 ratioDiff img =
-                    abs ((toFloat (fst img.ratio) / toFloat (snd img.ratio)) - targetRatio)
+                    abs ((toFloat (Tuple.first img.ratio) / toFloat (Tuple.second img.ratio)) - targetRatio)
 
                 ratioDiffComparison =
                     compare (ratioDiff currentImage) (ratioDiff bestImage)
