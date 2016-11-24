@@ -556,7 +556,7 @@ imageRatioDecoder =
                             |> List.map String.toInt
                 in
                     case intResults of
-                        [Ok w, Ok h] ->
+                        [ Ok w, Ok h ] ->
                             Json.Decode.succeed ( w, h )
 
                         _ ->
@@ -601,36 +601,39 @@ selectImageUrl ratio height imageList =
             (ceiling ((toFloat height) * targetRatio))
 
         selectBetterOfTwoImages : Image -> Image -> Image
-        selectBetterOfTwoImages currentImage bestImage =
+        selectBetterOfTwoImages nextImage bestImage =
             let
                 ratioDiff img =
                     abs ((toFloat (Tuple.first img.ratio) / toFloat (Tuple.second img.ratio)) - targetRatio)
 
                 ratioDiffComparison =
-                    compare (ratioDiff currentImage) (ratioDiff bestImage)
+                    compare (ratioDiff nextImage) (ratioDiff bestImage)
 
-                currentCoversTarget =
-                    (currentImage.width >= width) && (currentImage.height >= height)
+                bestCoversTarget =
+                    (bestImage.width >= width) && (bestImage.height >= height)
+
+                nextCoversTarget =
+                    (nextImage.width >= width) && (nextImage.height >= height)
             in
                 case ratioDiffComparison of
                     LT ->
-                        currentImage
+                        nextImage
 
                     GT ->
                         bestImage
 
                     EQ ->
-                        if currentCoversTarget then
+                        if bestCoversTarget then
                             -- Big enough to cover the target element => pick the smallest
-                            (if currentImage.width < bestImage.width then
-                                currentImage
+                            (if (nextImage.width < bestImage.width) && nextCoversTarget then
+                                nextImage
                              else
                                 bestImage
                             )
                         else
                             -- Too small to cover the target element => pick the biggest
-                            (if currentImage.width > bestImage.width then
-                                currentImage
+                            (if nextImage.width > bestImage.width then
+                                nextImage
                              else
                                 bestImage
                             )
