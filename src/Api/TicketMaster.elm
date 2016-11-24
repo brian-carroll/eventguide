@@ -561,7 +561,7 @@ imageRatioDecoder =
                             |> List.map String.toInt
                 in
                     case intResults of
-                        (Ok w) :: (Ok h) :: [] ->
+                        [Ok w, Ok h] ->
                             Json.Decode.succeed ( w, h )
 
                         _ ->

@@ -29,14 +29,14 @@ inputForm model =
     div []
         [ input
             [ placeholder "Start Date"
-            , value (TicketMaster.dateFormat model.startDate)
-            , onInput ChangeStartDate
+            , value (TicketMaster.dateFormat model.startTime)
+            , onInput ChangeStartTime
             ]
             []
         , input
             [ placeholder "End Date"
-            , value (TicketMaster.dateFormat model.endDate)
-            , onInput ChangeEndDate
+            , value (TicketMaster.dateFormat model.endTime)
+            , onInput ChangeEndTime
             ]
             []
         ]

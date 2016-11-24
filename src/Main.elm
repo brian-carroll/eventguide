@@ -25,12 +25,7 @@ import View
 
 {-| Entry point for the app
 -}
-
-
-
--- main : Program Never
-
-
+main : Program Never Model Msg
 main =
     Html.program
         { init = init
@@ -42,12 +37,12 @@ main =
 
 init : ( Model, Cmd Msg )
 init =
-    ( { events = Loading
+    ( { events = NotAsked
       , videos = Dict.empty
-      , startDate = Date.fromTime 0
-      , endDate = Date.fromTime 0
+      , startTime = 0
+      , endTime = 0
       }
-    , Task.perform InitFail Init Time.now
+    , Task.perform Init Time.now
     )
 
 
@@ -63,23 +58,20 @@ update msg model =
                     (1000 * round (nowTimeStamp / 1000))
 
                 start =
-                    Date.fromTime nowNearestSecond
+                    toFloat nowNearestSecond
 
                 end =
-                    Date.fromTime (nowNearestSecond + (days * 24 * round Time.hour))
+                    toFloat (nowNearestSecond + (days * 24 * round Time.hour))
             in
                 ( { model
-                    | startDate = start
-                    , endDate = end
+                    | events = Loading
+                    , startTime = start
+                    , endTime = end
                   }
                 , fetchEvents start end
                 )
 
-        InitFail _ ->
-            -- Never executed, since Time.now always succeeds
-            ( model, Cmd.none )
-
-        SearchFail e ->
+        SearchDone (Err e) ->
             ( { model
                 | events =
                     Failure e
@@ -87,7 +79,7 @@ update msg model =
             , Cmd.none
             )
 
-        SearchDone response ->
+        SearchDone (Ok response) ->
             let
                 ( updatedVideoDict, fetchVideosCmd ) =
                     generateVideoQueries response model.videos
@@ -99,15 +91,15 @@ update msg model =
                 , fetchVideosCmd
                 )
 
-        YouTubeFail searchTerm err ->
+        YouTubeResult searchTerm (Err e) ->
             ( { model
                 | videos =
-                    Dict.insert searchTerm (Failure err) model.videos
+                    Dict.insert searchTerm (Failure e) model.videos
               }
             , Cmd.none
             )
 
-        YouTubeSuccess searchTerm data ->
+        YouTubeResult searchTerm (Ok data) ->
             ( { model
                 | videos =
                     Dict.insert searchTerm (Success data) model.videos
@@ -115,22 +107,30 @@ update msg model =
             , Cmd.none
             )
 
-        ChangeStartDate s ->
+        ChangeStartTime s ->
             case Date.fromString s of
                 Ok d ->
-                    ( { model | startDate = d }
-                    , fetchEvents d model.endDate
-                    )
+                    let
+                        timestamp =
+                            Date.toTime d
+                    in
+                        ( { model | startTime = timestamp }
+                        , fetchEvents timestamp model.endTime
+                        )
 
                 Err _ ->
                     ( model, Cmd.none )
 
-        ChangeEndDate s ->
+        ChangeEndTime s ->
             case Date.fromString s of
                 Ok d ->
-                    ( { model | endDate = d }
-                    , fetchEvents model.startDate d
-                    )
+                    let
+                        timestamp =
+                            Date.toTime d
+                    in
+                        ( { model | endTime = timestamp }
+                        , fetchEvents model.startTime timestamp
+                        )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -145,12 +145,12 @@ fetchEvents start end =
                 , ( "countryCode", "gb" )
                 , ( "size", toString 10 )
                 , ( "classificationName", "music" )
-                , ( "startDateTime", TicketMaster.dateFormat start )
-                , ( "endDateTime", TicketMaster.dateFormat end )
+                , ( "startTimeTime", TicketMaster.dateFormat start )
+                , ( "endTimeTime", TicketMaster.dateFormat end )
                 ]
     in
-        Http.get TicketMaster.responseDecoder url
-            |> Task.perform SearchFail SearchDone
+        Http.send SearchDone
+            <| Http.get url TicketMaster.responseDecoder
 
 
 generateVideoQueries : TicketMaster.Response -> Dict String (WebData a) -> ( Dict String (WebData a), Cmd Msg )
@@ -176,14 +176,5 @@ generateVideoQueries response videoDict =
 
 fetchVideos : String -> Cmd Msg
 fetchVideos searchTerm =
-    let
-        genFailMsg : Http.Error -> Msg
-        genFailMsg err =
-            YouTubeFail searchTerm err
-
-        genSuccessMsg : YouTube.SearchResult -> Msg
-        genSuccessMsg result =
-            YouTubeSuccess searchTerm result
-    in
-        Http.get YouTube.decodeSearchResult (YouTube.searchUrl searchTerm)
-            |> Task.perform genFailMsg genSuccessMsg
+    Http.send (\x -> YouTubeResult searchTerm x)
+        <| Http.get (YouTube.searchUrl searchTerm) YouTube.decodeSearchResult
