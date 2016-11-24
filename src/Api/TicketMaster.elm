@@ -153,6 +153,16 @@ dateFormat d =
             ++ "Z"
 
 
+-------------------------------------------------
+
+eventSearchTerm : Event -> String
+eventSearchTerm event =
+    case List.head event.embedded.attractions of
+        Just attraction ->
+            attraction.name
+
+        Nothing ->
+            event.name
 
 -------------------------------------------------
 

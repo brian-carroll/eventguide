@@ -62,8 +62,11 @@ eventList model =
 event : Dict String (WebData YouTube.SearchResult) -> TicketMaster.Event -> Html Msg
 event videos ev =
     let
+        searchTerm =
+            TicketMaster.eventSearchTerm ev
+
         videoUrl =
-            case Dict.get ev.name videos of
+            case Dict.get searchTerm videos of
                 Just video ->
                     eventVideoUrl video
 

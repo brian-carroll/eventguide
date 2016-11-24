@@ -152,7 +152,7 @@ generateVideoQueries response videoDict =
     let
         newSearchTerms =
             response.events
-                |> List.map .name
+                |> List.map TicketMaster.eventSearchTerm
                 |> List.filter (\name -> not (Dict.member name videoDict))
 
         addLoadingItemToDict : String -> Dict String (WebData a) -> Dict String (WebData a)

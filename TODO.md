@@ -14,4 +14,4 @@ Build / Hosting
 [ ] SASS
 
 Functionality
-[ ] Use attraction rather than name if possible
+[x] Use attraction rather than name if possible
