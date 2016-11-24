@@ -437,6 +437,7 @@ type EventStatus
     = OnSale
     | OffSale
     | Rescheduled
+    | Postponed
     | Cancelled
 
 
@@ -458,6 +459,9 @@ eventStatusDecoder =
 
                     "rescheduled" ->
                         Json.Decode.succeed Rescheduled
+
+                    "postponed" ->
+                        Json.Decode.succeed Postponed
 
                     "cancelled" ->
                         Json.Decode.succeed Cancelled
