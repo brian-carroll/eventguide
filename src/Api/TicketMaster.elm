@@ -153,7 +153,9 @@ dateFormat d =
             ++ "Z"
 
 
+
 -------------------------------------------------
+
 
 eventSearchTerm : Event -> String
 eventSearchTerm event =
@@ -166,16 +168,26 @@ eventSearchTerm event =
                 Nothing ->
                     event.name
 
+        cleanup s =
+            case s of
+                "Undefined" ->
+                    ""
+
+                _ ->
+                    s
+
         classification =
             case List.head event.classifications of
                 Just c ->
-                    c.segment.name ++ " " ++ c.genre.name ++ " " ++ c.subGenre.name
+                    [ c.segment.name, c.genre.name, c.subGenre.name ]
+                        |> List.map cleanup
+                        |> String.join " "
 
                 Nothing ->
                     ""
-
     in
         "\"" ++ attractionName ++ "\" " ++ classification
+
 
 
 -------------------------------------------------
