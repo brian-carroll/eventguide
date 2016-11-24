@@ -1,9 +1,12 @@
 module Data.YouTubeResponse exposing (json)
+
+
 json : String
-json = """
+json =
+    """
 {
  "kind": "youtube#searchListResponse",
- "etag": "\\\"I_8xdZu766_FSaexEaDXTIfEWc0/qXO1taU73yD6FsqAEtHF3d0GZfM\\\"",
+ "etag": "\\"I_8xdZu766_FSaexEaDXTIfEWc0/qXO1taU73yD6FsqAEtHF3d0GZfM\\"",
  "nextPageToken": "CAUQAA",
  "regionCode": "GB",
  "pageInfo": {
@@ -13,7 +16,7 @@ json = """
  "items": [
   {
    "kind": "youtube#searchResult",
-   "etag": "\\\"I_8xdZu766_FSaexEaDXTIfEWc0/E_kz79fiPlRNsosDzZkZQl6WkMg\\\"",
+   "etag": "\\"I_8xdZu766_FSaexEaDXTIfEWc0/E_kz79fiPlRNsosDzZkZQl6WkMg\\"",
    "id": {
     "kind": "youtube#channel",
     "channelId": "UCwlTofOAY79PS_GhmborAdA"
@@ -40,7 +43,7 @@ json = """
   },
   {
    "kind": "youtube#searchResult",
-   "etag": "\\\"I_8xdZu766_FSaexEaDXTIfEWc0/g_8ezYRrrZHbOxrY-tIFvPuBIcE\\\"",
+   "etag": "\\"I_8xdZu766_FSaexEaDXTIfEWc0/g_8ezYRrrZHbOxrY-tIFvPuBIcE\\"",
    "id": {
     "kind": "youtube#video",
     "videoId": "LWr3WuThh-c"
@@ -73,7 +76,7 @@ json = """
   },
   {
    "kind": "youtube#searchResult",
-   "etag": "\\\"I_8xdZu766_FSaexEaDXTIfEWc0/w8nlWxXcGr8iEmBOJDL4cniYJVc\\\"",
+   "etag": "\\"I_8xdZu766_FSaexEaDXTIfEWc0/w8nlWxXcGr8iEmBOJDL4cniYJVc\\"",
    "id": {
     "kind": "youtube#video",
     "videoId": "9BMwcO6_hyA"
@@ -106,7 +109,7 @@ json = """
   },
   {
    "kind": "youtube#searchResult",
-   "etag": "\\\"I_8xdZu766_FSaexEaDXTIfEWc0/bRgn9_3-B62xUGqsawHsIUAuvnw\\\"",
+   "etag": "\\"I_8xdZu766_FSaexEaDXTIfEWc0/bRgn9_3-B62xUGqsawHsIUAuvnw\\"",
    "id": {
     "kind": "youtube#video",
     "videoId": "lDK9QqIzhwk"
@@ -139,7 +142,7 @@ json = """
   },
   {
    "kind": "youtube#searchResult",
-   "etag": "\\\"I_8xdZu766_FSaexEaDXTIfEWc0/Sih1wSYHeEHCH4paNKICwkNeV98\\\"",
+   "etag": "\\"I_8xdZu766_FSaexEaDXTIfEWc0/Sih1wSYHeEHCH4paNKICwkNeV98\\"",
    "id": {
     "kind": "youtube#video",
     "videoId": "vx2u5uUu3DE"

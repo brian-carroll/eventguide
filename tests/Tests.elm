@@ -5,7 +5,6 @@ import Expect
 import Api.TicketMaster as TicketMaster
 import Api.YouTube as YouTube
 import Json.Decode
-
 import Data.EventExample as EventExample
 import Data.TicketMasterResponse as TicketMasterResponse
 import Data.YouTubeResponse as YouTubeResponse
@@ -24,6 +23,7 @@ expectNoDecodeErrors decoder data =
     case Json.Decode.decodeString decoder data of
         Ok _ ->
             Expect.pass
+
         Err e ->
             Expect.fail e
 
@@ -42,5 +42,5 @@ decodeYouTube : Test
 decodeYouTube =
     describe "YouTube JSON decoder"
         [ test "can decode an example response"
-            (\_ -> expectNoDecodeErrors YouTube.decodeSearch YouTubeResponse.json)
+            (\_ -> expectNoDecodeErrors YouTube.decodeSearchResult YouTubeResponse.json)
         ]
