@@ -74,7 +74,12 @@ event videos ev =
             [ h3 [] [ text ev.name ]
             , div [ class "row well" ]
                 [ div [ class "col-md-4" ]
-                    [ img [ src (eventImageUrl ev) ] []
+                    [ img
+                        [ src (eventImageUrl ev)
+                        , width 205
+                        , height 105
+                        ]
+                        []
                     ]
                 , div [ class "col-md-4" ]
                     (eventDetails ev)

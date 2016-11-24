@@ -143,8 +143,8 @@ fetchEvents start end =
                 , ( "endDateTime", TicketMaster.dateFormat end )
                 ]
     in
-        Http.send SearchDone
-            <| Http.get url TicketMaster.responseDecoder
+        Http.send SearchDone <|
+            Http.get url TicketMaster.responseDecoder
 
 
 generateVideoQueries : TicketMaster.Response -> Dict String (WebData a) -> ( Dict String (WebData a), Cmd Msg )
@@ -170,5 +170,5 @@ generateVideoQueries response videoDict =
 
 fetchVideos : String -> Cmd Msg
 fetchVideos searchTerm =
-    Http.send (\x -> YouTubeResult searchTerm x)
-        <| Http.get (YouTube.searchUrl searchTerm) YouTube.decodeSearchResult
+    Http.send (\x -> YouTubeResult searchTerm x) <|
+        Http.get (YouTube.searchUrl searchTerm) YouTube.decodeSearchResult
