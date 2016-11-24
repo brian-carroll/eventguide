@@ -5,13 +5,12 @@ module Main exposing (main)
 -}
 
 -- External modules
--- import Html.App as App
 
-import TimeTravel.Html.App as App
+import Html
 import Task
 import Http
 import Platform.Cmd exposing (Cmd)
-import ISO8601
+import Date
 import Time
 import Dict exposing (Dict)
 
@@ -26,9 +25,14 @@ import View
 
 {-| Entry point for the app
 -}
-main : Program Never
+
+
+
+-- main : Program Never
+
+
 main =
-    App.program
+    Html.program
         { init = init
         , update = update
         , subscriptions = (\_ -> Sub.none)
@@ -40,8 +44,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { events = Loading
       , videos = Dict.empty
-      , startDate = ISO8601.fromTime 0
-      , endDate = ISO8601.fromTime 0
+      , startDate = Date.fromTime 0
+      , endDate = Date.fromTime 0
       }
     , Task.perform InitFail Init Time.now
     )
@@ -59,10 +63,10 @@ update msg model =
                     (1000 * round (nowTimeStamp / 1000))
 
                 start =
-                    ISO8601.fromTime nowNearestSecond
+                    Date.fromTime nowNearestSecond
 
                 end =
-                    ISO8601.fromTime (nowNearestSecond + (days * 24 * round Time.hour))
+                    Date.fromTime (nowNearestSecond + (days * 24 * round Time.hour))
             in
                 ( { model
                     | startDate = start
@@ -112,7 +116,7 @@ update msg model =
             )
 
         ChangeStartDate s ->
-            case ISO8601.fromString s of
+            case Date.fromString s of
                 Ok d ->
                     ( { model | startDate = d }
                     , fetchEvents d model.endDate
@@ -122,7 +126,7 @@ update msg model =
                     ( model, Cmd.none )
 
         ChangeEndDate s ->
-            case ISO8601.fromString s of
+            case Date.fromString s of
                 Ok d ->
                     ( { model | endDate = d }
                     , fetchEvents model.startDate d
@@ -132,7 +136,7 @@ update msg model =
                     ( model, Cmd.none )
 
 
-fetchEvents : ISO8601.Time -> ISO8601.Time -> Cmd Msg
+fetchEvents : Time.Time -> Time.Time -> Cmd Msg
 fetchEvents start end =
     let
         url =
@@ -141,8 +145,8 @@ fetchEvents start end =
                 , ( "countryCode", "gb" )
                 , ( "size", toString 10 )
                 , ( "classificationName", "music" )
-                , ( "startDateTime", ISO8601.toString start )
-                , ( "endDateTime", ISO8601.toString end )
+                , ( "startDateTime", TicketMaster.dateFormat start )
+                , ( "endDateTime", TicketMaster.dateFormat end )
                 ]
     in
         Http.get TicketMaster.responseDecoder url

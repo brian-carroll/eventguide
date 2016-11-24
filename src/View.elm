@@ -5,7 +5,6 @@ module View exposing (root)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import ISO8601
 import Dict exposing (Dict)
 
 
@@ -30,13 +29,13 @@ inputForm model =
     div []
         [ input
             [ placeholder "Start Date"
-            , value (ISO8601.toString model.startDate)
+            , value (TicketMaster.dateFormat model.startDate)
             , onInput ChangeStartDate
             ]
             []
         , input
             [ placeholder "End Date"
-            , value (ISO8601.toString model.endDate)
+            , value (TicketMaster.dateFormat model.endDate)
             , onInput ChangeEndDate
             ]
             []

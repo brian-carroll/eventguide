@@ -5,7 +5,7 @@ module Api.YouTube exposing (..)
 
 -- import Json.Encode
 
-import Json.Decode exposing (Decoder, string, list, int, object1, fail, andThen, (:=))
+import Json.Decode exposing (Decoder, string, list, int, map, fail, andThen, field)
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Http
 import String
@@ -19,11 +19,22 @@ apiKey =
 
 searchUrl : String -> String
 searchUrl searchTerm =
-    Http.url "https://www.googleapis.com/youtube/v3/search"
-        [ ( "part", "snippet" )
-        , ( "q", (Http.uriEncode searchTerm) )
-        , ( "key", apiKey )
-        ]
+    let
+        path =
+            "https://www.googleapis.com/youtube/v3/search"
+
+        query =
+            [ ( "part", "snippet" )
+            , ( "q", searchTerm )
+            , ( "key", apiKey )
+            ]
+
+        queryString =
+            query
+                |> List.map (\( k, v ) -> k ++ "=" ++ (Http.encodeUri v))
+                |> String.join "&"
+    in
+        path ++ "?" ++ queryString
 
 
 getFirstEmbedUrl : SearchResult -> Maybe String
@@ -125,20 +136,20 @@ decodeSearchResultItem =
 
 decodeSearchResultItemId : Decoder SearchResultItemId
 decodeSearchResultItemId =
-    ("kind" := string) |> andThen idKind
+    (field "kind" string) |> andThen idKind
 
 
 idKind : String -> Decoder SearchResultItemId
 idKind kind =
     case kind of
         "youtube#channel" ->
-            object1 Channel ("channelId" := string)
+            map Channel (field "channelId" string)
 
         "youtube#video" ->
-            object1 Video ("videoId" := string)
+            map Video (field "videoId" string)
 
         "youtube#playlist" ->
-            object1 Playlist ("playlistId" := string)
+            map Playlist (field "playlistId" string)
 
         _ ->
             fail "Unknown kind of YouTube object"

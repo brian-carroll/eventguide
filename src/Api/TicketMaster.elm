@@ -1,8 +1,9 @@
 module Api.TicketMaster exposing (..)
 
-import Json.Decode exposing (Decoder, string, bool, list, int, maybe, (:=), map)
+import Json.Decode exposing (Decoder, string, bool, list, int, maybe, field, map)
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Date exposing (Date)
+import Time
 import String
 import List
 import Http
@@ -79,10 +80,82 @@ apiParams =
 searchUrl : List ( String, String ) -> String
 searchUrl params =
     let
+        path =
+            "https://app.ticketmaster.com/discovery/v2/events.json"
+
         query =
             ( "apikey", "NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu" ) :: params
+
+        queryString =
+            query
+                |> List.map (\( k, v ) -> k ++ "=" ++ (Http.encodeUri v))
+                |> String.join "&"
     in
-        Http.url "https://app.ticketmaster.com/discovery/v2/events.json" query
+        path ++ "?" ++ queryString
+
+
+{-| Format date as ISO8601
+    2016-11-23T23:07:30Z
+-}
+dateFormat : Time.Time -> String
+dateFormat timestamp =
+    let
+        d =
+            Date.fromTime timestamp
+
+        twoDigits a =
+            String.right 2 ("0" ++ toString a)
+
+        monthNumberString =
+            case Date.month d of
+                Date.Jan ->
+                    "01"
+
+                Date.Feb ->
+                    "02"
+
+                Date.Mar ->
+                    "03"
+
+                Date.Apr ->
+                    "04"
+
+                Date.May ->
+                    "05"
+
+                Date.Jun ->
+                    "06"
+
+                Date.Jul ->
+                    "07"
+
+                Date.Aug ->
+                    "08"
+
+                Date.Sep ->
+                    "09"
+
+                Date.Oct ->
+                    "10"
+
+                Date.Nov ->
+                    "11"
+
+                Date.Dec ->
+                    "12"
+    in
+        toString (Date.year d)
+            ++ "-"
+            ++ monthNumberString
+            ++ "-"
+            ++ twoDigits (Date.day d)
+            ++ "T"
+            ++ twoDigits (Date.hour d)
+            ++ ":"
+            ++ twoDigits (Date.minute d)
+            ++ ":"
+            ++ twoDigits (Date.second d)
+            ++ "Z"
 
 
 
@@ -253,9 +326,9 @@ type alias Links =
 linksDecoder : Decoder Links
 linksDecoder =
     decode Links
-        |> required "self" ("href" := string)
-        |> optional "attractions" (list ("href" := string)) []
-        |> optional "venues" (list ("href" := string)) []
+        |> required "self" (field "href" string)
+        |> optional "attractions" (list (field "href" string)) []
+        |> optional "venues" (list (field "href" string)) []
 
 
 
@@ -378,26 +451,25 @@ type EventStatus
 
 eventStatusDecoder : Decoder EventStatus
 eventStatusDecoder =
-    let
-        getResult : String -> Result String EventStatus
-        getResult str =
-            case str of
-                "onsale" ->
-                    Ok OnSale
+    string
+        |> Json.Decode.andThen
+            (\str ->
+                case str of
+                    "onsale" ->
+                        Json.Decode.succeed OnSale
 
-                "offsale" ->
-                    Ok OffSale
+                    "offsale" ->
+                        Json.Decode.succeed OffSale
 
-                "rescheduled" ->
-                    Ok Rescheduled
+                    "rescheduled" ->
+                        Json.Decode.succeed Rescheduled
 
-                "cancelled" ->
-                    Ok Cancelled
+                    "cancelled" ->
+                        Json.Decode.succeed Cancelled
 
-                _ ->
-                    Err ("Unknown event status: " ++ str)
-    in
-        Json.Decode.customDecoder string getResult
+                    _ ->
+                        Json.Decode.fail ("Unknown event status: " ++ str)
+            )
 
 
 
@@ -480,22 +552,21 @@ imageDecoder =
 
 imageRatioDecoder : Decoder ( Int, Int )
 imageRatioDecoder =
-    let
-        getResult : String -> Result String ( Int, Int )
-        getResult str =
-            let
-                intResults =
-                    String.split "_" str
-                        |> List.map String.toInt
-            in
-                case intResults of
-                    (Ok w) :: (Ok h) :: [] ->
-                        Ok ( w, h )
+    string
+        |> Json.Decode.andThen
+            (\str ->
+                let
+                    intResults =
+                        String.split "_" str
+                            |> List.map String.toInt
+                in
+                    case intResults of
+                        (Ok w) :: (Ok h) :: [] ->
+                            Json.Decode.succeed ( w, h )
 
-                    _ ->
-                        Err "Can't decode image width and height"
-    in
-        Json.Decode.customDecoder string getResult
+                        _ ->
+                            Json.Decode.fail "Can't decode image width and height"
+            )
 
 
 
@@ -504,7 +575,16 @@ imageRatioDecoder =
 
 dateDecoder : Decoder Date.Date
 dateDecoder =
-    Json.Decode.customDecoder string Date.fromString
+    string
+        |> Json.Decode.andThen
+            (\s ->
+                case Date.fromString s of
+                    Ok d ->
+                        Json.Decode.succeed d
+
+                    Err e ->
+                        Json.Decode.fail e
+            )
 
 
 

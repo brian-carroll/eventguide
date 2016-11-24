@@ -4,7 +4,7 @@ import Http
 import Api.TicketMaster as TicketMaster
 import Api.YouTube as YouTube
 import Time
-import ISO8601
+import Date
 import Dict exposing (Dict)
 
 
@@ -33,6 +33,6 @@ type alias WebData a =
 type alias Model =
     { events : WebData TicketMaster.Response
     , videos : Dict String (WebData YouTube.SearchResult)
-    , startDate : ISO8601.Time
-    , endDate : ISO8601.Time
+    , startDate : Time.Time
+    , endDate : Time.Time
     }
