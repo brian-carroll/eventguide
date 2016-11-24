@@ -7,6 +7,7 @@ import String
 import List
 import Http
 import Set
+import Secrets
 
 
 apiParams : List String
@@ -84,7 +85,7 @@ searchUrl params =
             "https://app.ticketmaster.com/discovery/v2/events.json"
 
         query =
-            ( "apikey", "NYrUsoA13JfOGY9EnD7ZT1TGNZAL9IBu" ) :: params
+            ( "apikey", Secrets.ticketmaster ) :: params
 
         queryString =
             query

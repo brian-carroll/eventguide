@@ -10,11 +10,7 @@ import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Http
 import String
 import Maybe
-
-
-apiKey : String
-apiKey =
-    "AIzaSyAftxgHVWzom7wrW-mRNchNdaqeE14Ip8g"
+import Secrets
 
 
 searchUrl : String -> String
@@ -26,7 +22,7 @@ searchUrl searchTerm =
         query =
             [ ( "part", "snippet" )
             , ( "q", searchTerm )
-            , ( "key", apiKey )
+            , ( "key", Secrets.youtube )
             ]
 
         queryString =
