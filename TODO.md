@@ -15,3 +15,4 @@ Build / Hosting
 
 Functionality
 [x] Use attraction rather than name if possible
+[ ] Deal with 'undefined' in TicketMaster Classification fields

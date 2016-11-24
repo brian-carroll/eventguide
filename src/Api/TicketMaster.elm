@@ -157,12 +157,26 @@ dateFormat d =
 
 eventSearchTerm : Event -> String
 eventSearchTerm event =
-    case List.head event.embedded.attractions of
-        Just attraction ->
-            attraction.name
+    let
+        attractionName =
+            case List.head event.embedded.attractions of
+                Just attraction ->
+                    attraction.name
 
-        Nothing ->
-            event.name
+                Nothing ->
+                    event.name
+
+        classification =
+            case List.head event.classifications of
+                Just c ->
+                    c.segment.name ++ " " ++ c.genre.name ++ " " ++ c.subGenre.name
+
+                Nothing ->
+                    ""
+
+    in
+        "\"" ++ attractionName ++ "\" " ++ classification
+
 
 -------------------------------------------------
 
