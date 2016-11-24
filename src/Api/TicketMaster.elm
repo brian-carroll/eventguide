@@ -6,6 +6,7 @@ import Date exposing (Date)
 import String
 import List
 import Http
+import Set
 
 
 apiParams : List String
@@ -181,6 +182,11 @@ eventSearchTerm event =
                 Just c ->
                     [ c.segment.name, c.genre.name, c.subGenre.name ]
                         |> List.map cleanup
+                        |> String.join " "
+                        |> String.toLower
+                        |> String.words
+                        |> Set.fromList
+                        |> Set.toList
                         |> String.join " "
 
                 Nothing ->
