@@ -39,8 +39,8 @@ init : ( Model, Cmd Msg )
 init =
     ( { events = NotAsked
       , videos = Dict.empty
-      , startTime = 0
-      , endTime = 0
+      , startDate = Date.fromTime 0
+      , endDate = Date.fromTime 0
       }
     , Task.perform Init Time.now
     )
@@ -58,15 +58,17 @@ update msg model =
                     (1000 * round (nowTimeStamp / 1000))
 
                 start =
-                    toFloat nowNearestSecond
+                    Date.fromTime (toFloat nowNearestSecond)
 
                 end =
-                    toFloat (nowNearestSecond + (days * 24 * round Time.hour))
+                    (nowNearestSecond + (days * 24 * round Time.hour))
+                        |> toFloat
+                        |> Date.fromTime
             in
                 ( { model
                     | events = Loading
-                    , startTime = start
-                    , endTime = end
+                    , startDate = start
+                    , endDate = end
                   }
                 , fetchEvents start end
                 )
@@ -107,36 +109,28 @@ update msg model =
             , Cmd.none
             )
 
-        ChangeStartTime s ->
+        ChangeStartDate s ->
             case Date.fromString s of
                 Ok d ->
-                    let
-                        timestamp =
-                            Date.toTime d
-                    in
-                        ( { model | startTime = timestamp }
-                        , fetchEvents timestamp model.endTime
-                        )
+                    ( { model | startDate = d }
+                    , fetchEvents d model.endDate
+                    )
 
                 Err _ ->
                     ( model, Cmd.none )
 
-        ChangeEndTime s ->
+        ChangeEndDate s ->
             case Date.fromString s of
                 Ok d ->
-                    let
-                        timestamp =
-                            Date.toTime d
-                    in
-                        ( { model | endTime = timestamp }
-                        , fetchEvents model.startTime timestamp
-                        )
+                    ( { model | endDate = d }
+                    , fetchEvents model.startDate d
+                    )
 
                 Err _ ->
                     ( model, Cmd.none )
 
 
-fetchEvents : Time.Time -> Time.Time -> Cmd Msg
+fetchEvents : Date.Date -> Date.Date -> Cmd Msg
 fetchEvents start end =
     let
         url =
@@ -145,8 +139,8 @@ fetchEvents start end =
                 , ( "countryCode", "gb" )
                 , ( "size", toString 10 )
                 , ( "classificationName", "music" )
-                , ( "startTimeTime", TicketMaster.dateFormat start )
-                , ( "endTimeTime", TicketMaster.dateFormat end )
+                , ( "startDateTime", TicketMaster.dateFormat start )
+                , ( "endDateTime", TicketMaster.dateFormat end )
                 ]
     in
         Http.send SearchDone

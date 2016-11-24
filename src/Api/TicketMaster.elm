@@ -3,7 +3,6 @@ module Api.TicketMaster exposing (..)
 import Json.Decode exposing (Decoder, string, bool, list, int, maybe, field, map)
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Date exposing (Date)
-import Time
 import String
 import List
 import Http
@@ -94,19 +93,12 @@ searchUrl params =
         path ++ "?" ++ queryString
 
 
-{-| Format date as ISO8601
-    2016-11-23T23:07:30Z
+{-| Format date as ISO8601 without timezone ("2016-11-23T23:07:30Z")
 -}
-dateFormat : Time.Time -> String
-dateFormat timestamp =
+dateFormat : Date.Date -> String
+dateFormat d =
     let
-        d =
-            Date.fromTime timestamp
-
-        twoDigits a =
-            String.right 2 ("0" ++ toString a)
-
-        monthNumberString =
+        monthTwoDigitString =
             case Date.month d of
                 Date.Jan ->
                     "01"
@@ -143,10 +135,13 @@ dateFormat timestamp =
 
                 Date.Dec ->
                     "12"
+
+        twoDigits a =
+            String.right 2 ("0" ++ toString a)
     in
         toString (Date.year d)
             ++ "-"
-            ++ monthNumberString
+            ++ monthTwoDigitString
             ++ "-"
             ++ twoDigits (Date.day d)
             ++ "T"
@@ -217,7 +212,7 @@ type alias Event =
     , url : String
     , locale : String
     , images : List Image
-    , sales : Sales
+    , sales : Maybe Sales
     , dates : EventDates
     , classifications : List Classification
     , promoter : Maybe Promoter
@@ -238,7 +233,7 @@ eventDecoder =
         |> required "url" string
         |> required "locale" string
         |> required "images" (list imageDecoder)
-        |> required "sales" salesDecoder
+        |> optional "sales" (maybe salesDecoder) Nothing
         |> required "dates" eventDatesDecoder
         |> required "classifications" (list classificationDecoder)
         |> optional "promoter" (maybe promoterDecoder) Nothing

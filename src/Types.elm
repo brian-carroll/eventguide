@@ -12,8 +12,8 @@ type Msg
     = Init Time.Time
     | SearchDone (Result Http.Error TicketMaster.Response)
     | YouTubeResult String (Result Http.Error YouTube.SearchResult)
-    | ChangeStartTime String
-    | ChangeEndTime String
+    | ChangeStartDate String
+    | ChangeEndDate String
 
 
 type RemoteData e a
@@ -30,6 +30,6 @@ type alias WebData a =
 type alias Model =
     { events : WebData TicketMaster.Response
     , videos : Dict String (WebData YouTube.SearchResult)
-    , startTime : Time.Time
-    , endTime : Time.Time
+    , startDate : Date.Date
+    , endDate : Date.Date
     }
