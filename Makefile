@@ -25,6 +25,8 @@ dist/js/elm.min.js: dist/js/elm.js
 deploy: clean index.html dist/js/elm.min.js dist/css
 	@status=$$(git status --porcelain); \
 	commit=$$(git log -n 1 --pretty=format:%H); \
+	branch=$$(git rev-parse --abbrev-ref HEAD); \
+	msg=$$(printf "Deployed from $${branch}\n\nCommit $${commit}"); \
 	if [ -n "$${status}" ]; then \
 		echo ; \
 		echo " ** Working directory is dirty ** " >&2; \
@@ -35,6 +37,6 @@ deploy: clean index.html dist/js/elm.min.js dist/css
 		cp index.html ../eventguide-dist/index.html; \
 		cd ../eventguide-dist/; \
 		git add . ; \
-		git commit -m "Deployed by Makefile from commit $${commit}" ; \
+		git commit -m "$${msg}" ; \
 		git push; \
 	fi
