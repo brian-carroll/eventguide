@@ -1,4 +1,6 @@
 Styling
+[ ] Make nicer cards for each event. Look at other similar sites.
+[ ] Put YouTube content in a full-screen modal & load on-demand
 [ ] Consider Elm Bootstrapify (W3 Schools LOL!) or Elm Material Design Lite
 [ ] State indicators (Loading spinners, Video not available)
 [ ] Pricing
@@ -9,8 +11,8 @@ User Input Form
 [ ] Genre selection
 
 Build / Hosting
-[ ] GitHub Pages http://blog.jenkster.com/2016/02/git-for-static-sites.html
-[ ] Install Closure compiler from NPM rather than OS
+[x] GitHub Pages http://blog.jenkster.com/2016/02/git-for-static-sites.html
+[x] Install minification library from NPM rather than OS
 [ ] SASS
 
 Functionality
