@@ -17,18 +17,24 @@ test:
 	node_modules/.bin/elm-test
 
 
-.PHONY: compress
-compress:
+dist/js/elm.min.js: dist/js/elm.js
 	node_modules/.bin/uglifyjs dist/js/elm.js -o dist/js/elm.min.js --compress --mangle
 
 
 .PHONY: deploy
-deploy: clean dist/js/elm.js compress dist/css
-	message="Deployed from Makefile\n\n$(git status -sb)\n\n$(git show -q)"
-	rsync -ai --delete dist/css/ ../eventguide-dist/dist/css/
-	cp dist/js/elm.min.js ../eventguide-dist/dist/js/elm.js
-	cp index.html ../eventguide-dist/
-	cd ../eventguide-dist/
-	git add .
-	echo "$message" | git commit --file /dev/stdin
-	git push
+deploy: clean index.html dist/js/elm.min.js dist/css
+	@status=$$(git status --porcelain); \
+	commit=$$(git log -n 1 --pretty=format:%H); \
+	if [ -n "$${status}" ]; then \
+		echo ; \
+		echo " ** Working directory is dirty ** " >&2; \
+		echo "$${status}"; \
+	else \
+		rsync -ai --delete dist/css/ ../eventguide-dist/dist/css/; \
+		cp dist/js/elm.min.js ../eventguide-dist/dist/js/elm.js; \
+		cp index.html ../eventguide-dist/index.html; \
+		cd ../eventguide-dist/; \
+		git add . ; \
+		git commit -m "Deployed by Makefile from commit $${commit}" ; \
+		git push; \
+	fi
