@@ -1,32 +1,34 @@
-.PHONY clean test compress deploy
-
 dist/js/elm.js: src/* src/*/* elm-package.json
-	echo -e "Building Elm app into dist/\n\n"
-	rm -rf dist/js/elm.*
 	elm make src/Main.elm --output dist/js/elm.js
 
-dist/css/*: assets/css/*
-	echo -e "Copying CSS to dist/\n\n"
+
+dist/css: assets/css/*
 	rsync -ai --delete assets/css/ dist/css/
 
+
+.PHONY: clean
 clean:
-	echo -e "Deleting Elm build artifacts\n\n"
 	rm -rf tests/elm-stuff/build-artifacts/*/user
 	rm -rf elm-stuff/build-artifacts/*/user
 
-test: clean
-	echo -e "Running Elm tests...\n\n"
-	elm test
 
+.PHONY: test
+test:
+	node_modules/.bin/elm-test
+
+
+.PHONY: compress
 compress:
-	echo -e "Compressing JavaScript...\n\n"	
-	closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --language_in ECMASCRIPT5 --js dist/js/elm.js > dist/js/elm.min.js
-	mv dist/js/elm.min.js dist/js/elm.js
+	node_modules/.bin/uglifyjs dist/js/elm.js -o dist/js/elm.min.js --compress --mangle
 
-deploy: dist/js/elm.js compress
-	echo -e "Deploying to GitHub Pages...\n\n"
-	rsync -ai --delete dist/ ../eventguide-dist/dist/
+
+.PHONY: deploy
+deploy: clean dist/js/elm.js compress dist/css
+	message="Deployed from Makefile\n\n$(git status -sb)\n\n$(git show -q)"
+	rsync -ai --delete dist/css/ ../eventguide-dist/dist/css/
+	cp dist/js/elm.min.js ../eventguide-dist/dist/js/elm.js
 	cp index.html ../eventguide-dist/
 	cd ../eventguide-dist/
 	git add .
-	git commit -m ""
+	echo "$message" | git commit --file /dev/stdin
+	git push

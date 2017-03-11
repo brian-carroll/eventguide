@@ -8,15 +8,8 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "elm-test": "^0.17.3"
-  },
-  "scripts": {
-    "clean": "rm -rf tests/elm-stuff/build-artifacts/*/user ; rm -rf elm-stuff/build-artifacts/*/user",
-    "test": "npm run clean ; elm test",
-    "build": "rm -rf dist/js/elm.* && elm make src/Main.elm --output dist/js/elm.js && rsync -ai --delete assets/css/ dist/css/",
-    "debug": "rm -rf dist/js/elm.* && elm make src/Main.elm --debug --output dist/js/elm.js && rsync -ai --delete assets/css/ dist/css/",
-    "compress": "closure-compiler --compilation_level ADVANCED_OPTIMIZATIONS --language_in ECMASCRIPT5 --js dist/js/elm.js > dist/js/elm.min.js && gzip -fk dist/*s/* && ls -lhS dist/*s",
-    "deploy": "npm run build && npm run compress && rsync -ai --delete dist/ ../eventguide-dist/dist/ && cp index.html ../eventguide-dist/"
+    "elm-test": "^0.17.3",
+    "uglify-js": "^2.8.12"
   },
   "author": "",
   "license": "ISC"
