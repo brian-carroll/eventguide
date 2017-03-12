@@ -11,6 +11,7 @@ import Maybe exposing (Maybe)
 
 import Types exposing (..)
 import State exposing (selectClosestImageSize)
+import View.Icons as Icons
 
 
 event : Event -> Html Msg
@@ -25,25 +26,20 @@ event ev =
         div [] <|
             [ divBackgroundImage (selectClosestImageSize ratio height ev.images)
             , h4 [] [ text ev.title ]
-            , eventInfo calendarIcon (dateFormat ev.date)
-            , eventInfo mapPinIcon ev.venueLocation
+            , eventInfo Icons.calendar (dateFormat ev.date)
+            , eventInfo Icons.mapPin ev.venueLocation
             ]
 
 
 eventInfo icon displayText =
-    div [] [ text displayText ]
+    div []
+        [ icon
+        , text displayText
+        ]
 
 
 dateFormat d =
     toString d
-
-
-calendarIcon =
-    div [] []
-
-
-mapPinIcon =
-    div [] []
 
 
 divBackgroundImage : Maybe Image -> Html Msg
