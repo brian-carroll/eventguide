@@ -73,7 +73,7 @@ update msg model =
                 , fetchEvents start end
                 )
 
-        SearchDone (Err e) ->
+        ReceivedEvents (Err e) ->
             ( { model
                 | events =
                     Failure e
@@ -81,7 +81,7 @@ update msg model =
             , Cmd.none
             )
 
-        SearchDone (Ok response) ->
+        ReceivedEvents (Ok response) ->
             let
                 ( updatedVideoDict, fetchVideosCmd ) =
                     generateVideoQueries response model.videos
@@ -93,7 +93,7 @@ update msg model =
                 , fetchVideosCmd
                 )
 
-        YouTubeResult searchTerm (Err e) ->
+        ReceivedVideos searchTerm (Err e) ->
             ( { model
                 | videos =
                     Dict.insert searchTerm (Failure e) model.videos
@@ -101,7 +101,7 @@ update msg model =
             , Cmd.none
             )
 
-        YouTubeResult searchTerm (Ok data) ->
+        ReceivedVideos searchTerm (Ok data) ->
             ( { model
                 | videos =
                     Dict.insert searchTerm (Success data) model.videos
@@ -143,16 +143,16 @@ fetchEvents start end =
                 , ( "endDateTime", TicketMaster.dateFormat end )
                 ]
     in
-        Http.send SearchDone <|
-            Http.get url TicketMaster.responseDecoder
+        Http.send ReceivedEvents <|
+            Http.get url TicketMaster.appEventDecoder
 
 
-generateVideoQueries : TicketMaster.Response -> Dict String (WebData a) -> ( Dict String (WebData a), Cmd Msg )
-generateVideoQueries response videoDict =
+generateVideoQueries : List Event -> Dict String (WebData a) -> ( Dict String (WebData a), Cmd Msg )
+generateVideoQueries eventList videoDict =
     let
         newSearchTerms =
-            response.events
-                |> List.map TicketMaster.eventSearchTerm
+            eventList
+                |> List.map .contentSearchTerm
                 |> List.filter (\name -> not (Dict.member name videoDict))
 
         addLoadingItemToDict : String -> Dict String (WebData a) -> Dict String (WebData a)
@@ -170,5 +170,5 @@ generateVideoQueries response videoDict =
 
 fetchVideos : String -> Cmd Msg
 fetchVideos searchTerm =
-    Http.send (\x -> YouTubeResult searchTerm x) <|
-        Http.get (YouTube.searchUrl searchTerm) YouTube.decodeSearchResult
+    Http.send (\vids -> ReceivedVideos searchTerm vids) <|
+        Http.get (YouTube.searchUrl searchTerm) YouTube.decodeAppVideoList

@@ -1,8 +1,6 @@
 module Types exposing (..)
 
 import Http
-import Api.TicketMaster as TicketMaster
-import Api.YouTube as YouTube
 import Time
 import Date
 import Dict exposing (Dict)
@@ -10,8 +8,8 @@ import Dict exposing (Dict)
 
 type Msg
     = Init Time.Time
-    | SearchDone (Result Http.Error TicketMaster.Response)
-    | YouTubeResult String (Result Http.Error YouTube.SearchResult)
+    | ReceivedEvents (Result Http.Error (List Event))
+    | ReceivedVideos String (Result Http.Error (List Video))
     | ChangeStartDate String
     | ChangeEndDate String
 
@@ -28,8 +26,38 @@ type alias WebData a =
 
 
 type alias Model =
-    { events : WebData TicketMaster.Response
-    , videos : Dict String (WebData YouTube.SearchResult)
+    { events : WebData (List Event)
+    , videos : Dict String (WebData (List Video))
     , startDate : Date.Date
     , endDate : Date.Date
+    }
+
+
+type alias Event =
+    { images : List Image
+    , title : String
+    , date : Date.Date
+    , venueLocation : Maybe String
+    , priceX100 : Maybe Int
+    , contentSearchTerm : String
+    }
+
+
+{-|
+Possible extra fields for Video:
+, title : String
+, description : String
+, thumbnailUrls : List String
+-}
+type alias Video =
+    { url : String
+    }
+
+
+type alias Image =
+    { ratio : ( Int, Int )
+    , url : String
+    , width : Int
+    , height : Int
+    , fallback : Bool
     }

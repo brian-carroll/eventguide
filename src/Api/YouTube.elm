@@ -1,16 +1,28 @@
 module Api.YouTube exposing (..)
 
 {-| Auto-generated using http://noredink.github.io/json-to-elm/
+    And then modified by hand
 -}
 
--- import Json.Encode
+-- Standard lib imports
 
 import Json.Decode exposing (Decoder, string, list, int, map, fail, andThen, field)
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Http
 import String
-import Maybe
+import Maybe exposing (Maybe(..))
+import Maybe.Extra
+
+
+-- App imports
+
 import Secrets
+import Types as AppTypes
+
+
+{---------------------------------------------------
+   Interface to main application
+----------------------------------------------------}
 
 
 searchUrl : String -> String
@@ -33,21 +45,34 @@ searchUrl searchTerm =
         path ++ "?" ++ queryString
 
 
-getFirstEmbedUrl : SearchResult -> Maybe String
-getFirstEmbedUrl searchResult =
-    let
-        getVideoId item =
-            case item.id of
-                Video id ->
-                    Just id
+decodeAppVideoList : Decoder (List AppTypes.Video)
+decodeAppVideoList =
+    map appVideoListMapper decodeSearchResult
 
-                _ ->
-                    Nothing
-    in
-        searchResult.items
-            |> List.filterMap getVideoId
-            |> List.head
-            |> Maybe.map (String.append "https://www.youtube.com/embed/")
+
+appVideoListMapper : SearchResult -> List AppTypes.Video
+appVideoListMapper searchResult =
+    List.map appVideoMapper searchResult.items
+        |> Maybe.Extra.values
+
+
+appVideoMapper : SearchResultItem -> Maybe AppTypes.Video
+appVideoMapper item =
+    case item.id of
+        Video str ->
+            Just { url = "https://www.youtube.com/embed/" ++ str }
+
+        Channel _ ->
+            Nothing
+
+        Playlist _ ->
+            Nothing
+
+
+
+{---------------------------------------------------
+   YouTube API
+----------------------------------------------------}
 
 
 type alias SearchResult =

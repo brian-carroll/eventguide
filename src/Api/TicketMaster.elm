@@ -1,5 +1,7 @@
 module Api.TicketMaster exposing (..)
 
+-- Standard lib imports
+
 import Json.Decode exposing (Decoder, string, bool, list, int, maybe, field, map)
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Date exposing (Date)
@@ -7,7 +9,13 @@ import String
 import List
 import Http
 import Set
+import Maybe
+
+
+-- App imports
+
 import Secrets
+import Types as AppTypes exposing (Image)
 
 
 apiParams : List String
@@ -194,6 +202,30 @@ eventSearchTerm event =
                     ""
     in
         "\"" ++ attractionName ++ "\" " ++ classification
+
+
+{-|
+ Decode API response into the generic Event type used by the main application
+-}
+appEventDecoder : Decoder (List AppTypes.Event)
+appEventDecoder =
+    map appEventListMapper responseDecoder
+
+
+appEventListMapper : Response -> List AppTypes.Event
+appEventListMapper response =
+    List.map appEventMapper response.events
+
+
+appEventMapper : Event -> AppTypes.Event
+appEventMapper tmEvent =
+    { images = tmEvent.images
+    , title = tmEvent.name
+    , date = tmEvent.dates.start.dateTime
+    , venueLocation = List.head tmEvent.embedded.venues |> Maybe.map .name
+    , priceX100 = Nothing
+    , contentSearchTerm = eventSearchTerm tmEvent
+    }
 
 
 
@@ -571,15 +603,6 @@ preSaleDecoder =
 
 
 -------------------------------------------------
-
-
-type alias Image =
-    { ratio : ( Int, Int )
-    , url : String
-    , width : Int
-    , height : Int
-    , fallback : Bool
-    }
 
 
 imageDecoder : Decoder Image
