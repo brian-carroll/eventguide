@@ -37,7 +37,7 @@ type alias Event =
     { images : List Image
     , title : String
     , date : Date.Date
-    , venueLocation : Maybe String
+    , venueLocation : String
     , priceX100 : Maybe Int
     , contentSearchTerm : String
     }

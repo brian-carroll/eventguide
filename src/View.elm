@@ -11,13 +11,14 @@ import Html.Attributes exposing (..)
 -- Local modules
 
 import Types exposing (..)
+import View.EventList exposing (..)
 
 
 root : Model -> Html Msg
 root model =
     div [ class "container" ]
         [ h1 [] [ text "Brian's Event Guide" ]
-        , text <| toString model
+        , eventList model.events
         ]
 
 

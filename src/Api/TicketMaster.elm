@@ -222,7 +222,7 @@ appEventMapper tmEvent =
     { images = tmEvent.images
     , title = tmEvent.name
     , date = tmEvent.dates.start.dateTime
-    , venueLocation = List.head tmEvent.embedded.venues |> Maybe.map .name
+    , venueLocation = List.head tmEvent.embedded.venues |> Maybe.map .name |> Maybe.withDefault ""
     , priceX100 = Nothing
     , contentSearchTerm = eventSearchTerm tmEvent
     }
@@ -310,7 +310,7 @@ eventDecoder =
         |> required "images" (list imageDecoder)
         |> optional "sales" (maybe salesDecoder) Nothing
         |> required "dates" eventDatesDecoder
-        |> required "classifications" (list classificationDecoder)
+        |> optional "classifications" (list classificationDecoder) []
         |> optional "promoter" (maybe promoterDecoder) Nothing
         |> optional "info" (maybe string) Nothing
         |> optional "pleaseNote" (maybe string) Nothing
@@ -654,63 +654,3 @@ dateDecoder =
 
 
 -------------------------------------------------
-
-
-{-| Pick the best available image, given target aspect ratio and height.
-Intended for use with "background-image" and "background-size: cover"
-1st priority: pick the closest aspect ratio, to avoid clipping if possible
-2nd priority: pick the smallest image that's big enough to cover the target area
--}
-selectImageUrl : ( Int, Int ) -> Int -> List Image -> String
-selectImageUrl ratio height imageList =
-    let
-        targetRatio =
-            toFloat (Tuple.first ratio) / toFloat (Tuple.second ratio)
-
-        width =
-            (ceiling ((toFloat height) * targetRatio))
-
-        selectBetterOfTwoImages : Image -> Image -> Image
-        selectBetterOfTwoImages nextImage bestImage =
-            let
-                ratioDiff img =
-                    abs ((toFloat (Tuple.first img.ratio) / toFloat (Tuple.second img.ratio)) - targetRatio)
-
-                ratioDiffComparison =
-                    compare (ratioDiff nextImage) (ratioDiff bestImage)
-
-                bestCoversTarget =
-                    (bestImage.width >= width) && (bestImage.height >= height)
-
-                nextCoversTarget =
-                    (nextImage.width >= width) && (nextImage.height >= height)
-            in
-                case ratioDiffComparison of
-                    LT ->
-                        nextImage
-
-                    GT ->
-                        bestImage
-
-                    EQ ->
-                        if bestCoversTarget then
-                            -- Big enough to cover the target element => pick the smallest
-                            (if (nextImage.width < bestImage.width) && nextCoversTarget then
-                                nextImage
-                             else
-                                bestImage
-                            )
-                        else
-                            -- Too small to cover the target element => pick the biggest
-                            (if nextImage.width > bestImage.width then
-                                nextImage
-                             else
-                                bestImage
-                            )
-    in
-        case imageList of
-            [] ->
-                ""
-
-            h :: t ->
-                .url (List.foldl selectBetterOfTwoImages h t)
