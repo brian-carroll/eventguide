@@ -5,6 +5,7 @@ module View.Event exposing (event)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Maybe exposing (Maybe)
+import Date exposing (Date)
 
 
 -- Local modules
@@ -31,6 +32,7 @@ event ev =
             ]
 
 
+eventInfo : Html msg -> String -> Html msg
 eventInfo icon displayText =
     div []
         [ icon
@@ -38,6 +40,7 @@ eventInfo icon displayText =
         ]
 
 
+dateFormat : Date -> String
 dateFormat d =
     toString d
 
@@ -46,12 +49,8 @@ divBackgroundImage : Maybe Image -> Html Msg
 divBackgroundImage maybeImage =
     let
         url =
-            case maybeImage of
-                Nothing ->
-                    ""
-
-                Just img ->
-                    img.url
+            Maybe.map .url maybeImage
+                |> Maybe.withDefault ""
 
         defaultColor =
             "gray"
@@ -68,8 +67,4 @@ divBackgroundImage maybeImage =
                 , ( "background-repeat", "no-repeat" )
                 ]
             ]
-            [ text <| "URL: " ++ url ]
-
-
-
--- center center cover no-repeat"
+            []

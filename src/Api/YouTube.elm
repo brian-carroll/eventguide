@@ -10,8 +10,6 @@ import Json.Decode exposing (Decoder, string, list, int, map, fail, andThen, fie
 import Json.Decode.Pipeline exposing (decode, required, requiredAt, optional)
 import Http
 import String
-import Maybe exposing (Maybe(..))
-import Maybe.Extra
 
 
 -- App imports
@@ -52,21 +50,20 @@ decodeAppVideoList =
 
 appVideoListMapper : SearchResult -> List AppTypes.Video
 appVideoListMapper searchResult =
-    List.map appVideoMapper searchResult.items
-        |> Maybe.Extra.values
+    List.foldr appVideoMapper [] searchResult.items
 
 
-appVideoMapper : SearchResultItem -> Maybe AppTypes.Video
-appVideoMapper item =
+appVideoMapper : SearchResultItem -> List AppTypes.Video -> List AppTypes.Video
+appVideoMapper item videoList =
     case item.id of
         Video str ->
-            Just { url = "https://www.youtube.com/embed/" ++ str }
+            { url = "https://www.youtube.com/embed/" ++ str } :: videoList
 
         Channel _ ->
-            Nothing
+            videoList
 
         Playlist _ ->
-            Nothing
+            videoList
 
 
 

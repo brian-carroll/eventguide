@@ -10,6 +10,7 @@ import List
 import Http
 import Set
 import Maybe
+import Maybe.Extra
 
 
 -- App imports
@@ -332,7 +333,7 @@ embeddedDecoder : Decoder Embedded
 embeddedDecoder =
     decode Embedded
         |> optional "venues" (list venueDecoder) []
-        |> optional "attractions" (list attractionDecoder) []
+        |> optional "attractions" attractionListDecoder []
 
 
 emptyEmbedded : Embedded
@@ -354,13 +355,16 @@ type alias Attraction =
     }
 
 
-attractionDecoder : Decoder Attraction
-attractionDecoder =
+attractionListDecoder : Decoder (List Attraction)
+attractionListDecoder =
     decode Attraction
         |> required "name" string
         |> required "url" string
         |> required "images" (list imageDecoder)
         |> required "classifications" (list classificationDecoder)
+        |> maybe
+        |> list
+        |> Json.Decode.andThen (Maybe.Extra.values >> Json.Decode.succeed)
 
 
 
