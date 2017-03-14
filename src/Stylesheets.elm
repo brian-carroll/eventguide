@@ -70,56 +70,20 @@ css =
             , overflow hidden
             , width (pct 100)
             ]
+        , class EventBody
+            [ displayFlex
+            , flexFlow1 column
+              -- display -ms-flexbox
+              -- -ms-flex-flow column
+            , height (Css.rem 14.5625)
+            , padding2 (Css.rem 1.125) (Css.rem 1.25)
+            , position relative
+            ]
         ]
 
 
 
 {-
-     event-list
-       event-wrapper
-         event (translateY on hover)
-             a.event__image
-                 image (background)
-             event__body
-                 event__info
-                     a
-                         h4 title
-                     event-group-meta-item
-                         event-group-meta-item__icon
-                         event-group-meta-item__info
-                     event-group-meta-item
-                         event-group-meta-item__icon
-                         event-group-meta-item__info
-                 event__footer (appears on hover)
-                     event__price
-                     a.button
-
-   @media (min-width: 601px) {
-       .collection-list--three-columns .collection-item {
-           width: 50%
-       }
-       }
-    @media (min-width: 961px) {
-    .collection-list--three-columns .collection-item {
-        width: 33.32%
-    }
-
-
-   .event-group-item {
-       background: #fff;
-       border-radius: 2px;
-       box-shadow: 0 1px 2px rgba(0, 0, 0, .1), 0 0 2px rgba(0, 0, 0, .1);
-       color: #404d57;
-       cursor: pointer;
-       position: relative;
-       width: 100%;
-       transition: transform .24s, box-shadow .24s
-   }
-   .event-group-item:hover {
-       box-shadow: 0 4px 6px rgba(0, 0, 0, .1), 0 0 2px rgba(0, 0, 0, .1);
-       transform: translate(0, -4px);
-       transform: translateY(-4px)
-   }
 
    a.event-group-item__image {
        border-radius: 2px 2px 0 0;
