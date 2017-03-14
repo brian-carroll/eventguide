@@ -1,15 +1,20 @@
-dist/js/elm.js: src/* src/*/* elm-package.json
-	elm make src/Main.elm --output dist/js/elm.js
+.PHONY: elm
+elm: dist/elm.js dist/index.css
 
 
-dist/css: assets/css/*
-	rsync -ai --delete assets/css/ dist/css/
+dist/elm.js: src/* src/*/* elm-package.json
+	elm make src/Main.elm --output dist/elm.js
+
+
+dist/index.css: src/Stylesheets.elm
+	node_modules/.bin/elm-css --module Stylesheets --output dist/ src/Stylesheets.elm
 
 
 .PHONY: clean
 clean:
 	rm -rf tests/elm-stuff/build-artifacts/*/user
 	rm -rf elm-stuff/build-artifacts/*/user
+	rm -rf dist/*
 
 
 .PHONY: test
@@ -17,12 +22,12 @@ test:
 	node_modules/.bin/elm-test
 
 
-dist/js/elm.min.js: dist/js/elm.js
-	node_modules/.bin/uglifyjs dist/js/elm.js -o dist/js/elm.min.js --compress --mangle
+dist/elm.min.js: dist/elm.js
+	node_modules/.bin/uglifyjs dist/elm.js -o dist/elm.min.js --compress --mangle
 
 
 .PHONY: deploy
-deploy: clean index.html dist/js/elm.min.js dist/css
+deploy: clean index.html dist/elm.min.js dist
 	@status=$$(git status --porcelain); \
 	commit=$$(git log -n 1 --pretty=format:%H); \
 	branch=$$(git rev-parse --abbrev-ref HEAD); \
@@ -32,8 +37,8 @@ deploy: clean index.html dist/js/elm.min.js dist/css
 		echo " ** Working directory is dirty ** " >&2; \
 		echo "$${status}"; \
 	else \
-		rsync -ai --delete dist/css/ ../eventguide-dist/dist/css/; \
-		cp dist/js/elm.min.js ../eventguide-dist/dist/js/elm.js; \
+		rsync -ai --delete dist/ ../eventguide-dist/dist/; \
+		cp dist/elm.min.js ../eventguide-dist/dist/elm.js; \
 		cp index.html ../eventguide-dist/index.html; \
 		cd ../eventguide-dist/; \
 		git add . ; \
