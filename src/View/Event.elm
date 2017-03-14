@@ -14,7 +14,7 @@ import Html.CssHelpers
 import Types exposing (..)
 import State exposing (selectClosestImageSize)
 import View.Icons as Icons
-import Stylesheets
+import Stylesheets exposing (CssClasses(..))
 
 
 { id, class, classList } =
@@ -30,12 +30,16 @@ event ev =
         height =
             115
     in
-        div []
-            [ divBackgroundImage (selectClosestImageSize ratio height ev.images)
-            , div []
-                [ h4 [] [ text ev.title ]
-                , eventInfo Icons.calendar (dateFormat ev.date)
-                , eventInfo Icons.mapPin ev.venueLocation
+        div
+            [ class [ Stylesheets.EventWrapper ] ]
+            [ div
+                [ class [ Stylesheets.Event ] ]
+                [ divBackgroundImage (selectClosestImageSize ratio height ev.images)
+                , div []
+                    [ h4 [] [ text ev.title ]
+                    , eventInfo Icons.calendar (dateFormat ev.date)
+                    , eventInfo Icons.mapPin ev.venueLocation
+                    ]
                 ]
             ]
 
@@ -63,7 +67,7 @@ divBackgroundImage maybeImage =
         defaultColor =
             "gray"
     in
-        div [ class [ Stylesheets.EventImage ] ]
+        div [ class [ EventImage ] ]
             [ div
                 [ style
                     [ ( "width", "100%" )

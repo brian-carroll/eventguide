@@ -3,12 +3,19 @@ module View.EventList exposing (eventList)
 -- External modules
 
 import Html exposing (..)
+import Html.CssHelpers
 
 
 -- Local modules
 
 import Types exposing (..)
 import View.Event exposing (event)
+import Stylesheets exposing (CssClasses(..))
+
+
+{ id, class, classList } =
+    Html.CssHelpers.withNamespace ""
+
 
 
 -- View
@@ -27,5 +34,5 @@ eventList events =
             text (toString error)
 
         Success data ->
-            div []
+            div [ class [ Stylesheets.EventList ] ]
                 (List.map event data)
