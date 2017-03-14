@@ -26,6 +26,13 @@ dist/elm.min.js: dist/elm.js
 	node_modules/.bin/uglifyjs dist/elm.js -o dist/elm.min.js --compress --mangle
 
 
+# Make syntax is nearly, but not quite, the same as shell script! :(
+#	@	Don't echo the command
+# 	$$	Shell script '$', rather than Make '$'
+#
+# Each *line* is executed in its own shell => use ';' and '\' to chain commands as one line
+# https://www.gnu.org/software/make/manual/html_node/index.html
+#
 .PHONY: deploy
 deploy: clean index.html dist/elm.min.js dist
 	@status=$$(git status --porcelain); \
