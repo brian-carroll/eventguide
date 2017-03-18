@@ -14,7 +14,7 @@ import Html.CssHelpers
 import Types exposing (..)
 import State exposing (selectClosestImageSize)
 import View.Icons as Icons
-import Stylesheets exposing (CssClasses(..))
+import Styles exposing (CssClasses(..))
 
 
 { id, class, classList } =
@@ -31,9 +31,9 @@ event ev =
             115
     in
         div
-            [ class [ Stylesheets.EventWrapper ] ]
+            [ class [ Styles.EventWrapper ] ]
             [ div
-                [ class [ Stylesheets.Event ] ]
+                [ class [ Styles.Event ] ]
                 [ divBackgroundImage (selectClosestImageSize ratio height ev.images)
                 , div []
                     [ h4 [] [ text ev.title ]

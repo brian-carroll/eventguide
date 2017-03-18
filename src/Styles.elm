@@ -1,4 +1,4 @@
-port module Stylesheets exposing (..)
+port module Styles exposing (..)
 
 import Css exposing (..)
 import Css.File exposing (CssFileStructure, CssCompilerProgram)
