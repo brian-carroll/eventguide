@@ -33,13 +33,13 @@ dist/elm.min.js: dist/elm.js
 
 
 # Make syntax is nearly, but not quite, the same as shell script! :(
-#		@			Don't echo the command
-# 	$$		Shell script '$', rather than Make '$'
+#	 @		Don't echo the command
+#	$$		Shell script '$', rather than Make '$'
 # Each *line* is executed in its own shell => use ';' and '\' to chain commands as one line
 # https://www.gnu.org/software/make/manual/html_node/index.html
 #
 .PHONY: deploy
-deploy: clean index.html dist/elm.min.js dist ../eventguide-dist
+deploy: clean index.html dist/elm.min.js dist/index.css ../eventguide-dist
 	@status=$$(git status --porcelain); \
 	commit=$$(git log -n 1 --pretty=format:%H); \
 	branch=$$(git rev-parse --abbrev-ref HEAD); \
@@ -49,8 +49,8 @@ deploy: clean index.html dist/elm.min.js dist ../eventguide-dist
 		echo " ** Working directory is dirty ** " >&2; \
 		echo "$${status}"; \
 	else \
-		rsync -ai --delete dist/ ../eventguide-dist/dist/; \
 		cp dist/elm.min.js ../eventguide-dist/dist/elm.js; \
+		cp dist/index.css ../eventguide-dist/dist/index.css; \
 		cp index.html ../eventguide-dist/index.html; \
 		cd ../eventguide-dist/; \
 		git add . ; \
