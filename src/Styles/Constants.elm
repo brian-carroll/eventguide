@@ -1,6 +1,10 @@
-module Styles.Colours exposing (..)
+module Styles.Constants exposing (..)
 
 import Css exposing (hex)
+
+
+cubic =
+    "cubicBezier(0.215, 0.61, 0.355, 1)"
 
 
 black =

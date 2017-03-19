@@ -28,13 +28,16 @@ event ev =
             ( 16, 9 )
 
         height =
-            115
+            250
     in
         div
             [ class [ Card ] ]
-            [ divBackgroundImage (selectClosestImageSize ratio height ev.images)
-            , div []
-                [ h4 [] [ text ev.title ]
+            [ div [ class [ CardCover ], style [ ( "height", toString height ++ "px" ) ] ]
+                [ div [ class [ BgOverlay, BgOverlay_Dark, BgOverlay_25 ] ] []
+                , divBackgroundImage (selectClosestImageSize ratio height ev.images)
+                ]
+            , div [ class [ CardBody ] ]
+                [ h2 [ class [ CardHeading ] ] [ text ev.title ]
                 , eventInfo Icons.calendar (dateFormat ev.date)
                 , eventInfo Icons.mapPin ev.venueLocation
                 ]

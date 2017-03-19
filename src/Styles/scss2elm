@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+
+"""
+Buggy utility script to do *some* of the conversion steps from SCSS to Elm-Css
+Output needs to be manually edited afterwards until elm-make is happy etc.
+"""
+
+
+import sys
+import re
+
+
+class StringSub(object):
+    def __init__(self, val):
+        self.val = val
+    def sub(self, search, replace, *args):
+        self.val = re.sub(search, replace, self.val, *args)
+        return self
+
+def matchToUpper(match):
+    return match.expand(r'\1').upper()
+
+def process_file(text):
+    s = StringSub(text)
+    s.sub(r';\s}', '\n]')
+    s.sub(r'{\s', '\n[')
+    s.sub(r';\s', '\n,')
+    s.sub(r':', '')
+    s.sub(r'\s\.([a-z])', lambda m: ', class ' + matchToUpper(m))  # class names
+    s.sub(r',', r'[', 1)   # first class needs [ instead of ,
+    s.sub(r'-([a-z0-9])', matchToUpper)  # camelCase
+    s.sub(r'-', r'_')
+    s.sub(r'(\d+)\s*%', r'(pct \1)')
+    s.sub(r'(\d+)\s*px', r'(px \1)')
+    s.sub(r'(\d+)\s*rem', r'(Css.rem \1)')
+    s.sub(r'(\s)0(\s)', r'\1zero\2')
+
+    elm = 'css =\n stylesheet\n' + s.val + ']'
+    classes = re.findall(r'class (\S+)', elm)
+    elm_classes = "\ntype Class\n  = " + '\n  | '.join(classes) + '\n'
+
+    variables = set(re.findall(r'\$([a-zA-Z0-9]+)', elm))
+    elm_variables = '\n{- variables:\n ' + '\n '.join(variables) + '\n-}\n'
+
+    elm = elm_classes + elm_variables + elm.replace('$', '')
+
+    return elm
+
+def main():
+    with open(sys.argv[1]) as f:
+        text = f.read()
+    print process_file(text)
+
+if __name__ == '__main__':
+    main()

@@ -10,7 +10,8 @@ import Maybe.Extra
 -- Local modules
 
 import Styles.Selectors exposing (..)
-import Styles.Card as Card
+import Styles.Card
+import Styles.BgOverlay
 
 
 port files : CssFileStructure -> Cmd msg
@@ -30,7 +31,8 @@ main =
 css : Stylesheet
 css =
     mergeStyleSheets
-        [ Card.css
+        [ Styles.Card.css
+        , Styles.BgOverlay.css
         ]
 
 

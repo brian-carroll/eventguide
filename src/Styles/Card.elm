@@ -2,7 +2,7 @@ module Styles.Card exposing (css)
 
 import Css exposing (..)
 import Styles.Selectors exposing (..)
-import Styles.Colours exposing (white, greyL, greyM, asphaltL, asphaltM)
+import Styles.Constants exposing (white, greyL, greyM, asphaltL, asphaltM)
 
 
 css : Stylesheet
@@ -40,22 +40,24 @@ css =
               -- , backfaceVisibility hidden
             , textRendering optimizeLegibility
             , transform <| translateZ zero
-              -- , hover
-              --     [ BgOverlay
-              --         [ opacity 0
-              --         ]
-              --     ]
+            , hover
+                [ descendants
+                    [ class BgOverlay
+                        [ opacity zero
+                        ]
+                    ]
+                ]
             ]
-          -- , class BgOverlay
-          --     [ zIndex 1
-          --     ]
-          -- , class BtnPlay
-          --     [ position absolute
-          --     , top (pct 50)
-          --     , left (pct 50)
-          --     , backgroundColor asphaltM
-          --       -- transform translate((pct -50),(pct -50)) scale(0.8),
-          --     ]
+        , class BgOverlay
+            [ zIndex (int 1)
+            ]
+        , class BtnPlay
+            [ position absolute
+            , top (pct 50)
+            , left (pct 50)
+            , backgroundColor asphaltM
+            , transforms [ translate2 (pct -50) (pct -50), (scale 0.8) ]
+            ]
           -- , class CardEmpty
           --     [ marginTop (px 32)
           --     , marginBottom (px 32)
@@ -85,37 +87,29 @@ css =
           --             , color greyL
           --             ]
           --         , hover
-          --             [ CardCover
-          --                 [ borderColor asphaltL
+          --             [ descendants
+          --                 [ CardCover
+          --                     [ borderColor asphaltL
+          --                     ]
           --                 ]
           --             ]
           --         ]
           --     ]
-          -- , class CardCover
-          --     [ position relative
-          --     , backgroundColor greyL
-          --     , backgroundSize cover
-          --     , backgroundPosition center center
-          --     , backgroundRepeat noRepeat
-          --       -- , backfaceVisibility hidden
-          --     , overflow hidden
-          --     , after
-          --         [ display block
-          --         , content ""
-          --         , width (pct 100)
-          --         , paddingTop (px 56) (pct 25)
-          --         ]
-          --     , class Badge
-          --         [ position absolute
-          --         , zIndex 5
-          --         , top (px 16)
-          --         , right (px 24)
-          --         , borderColor white
-          --         , backgroundColor asphaltM
-          --         , color white
-          --           -- , backfaceVisibility hidden
-          --         ]
-          --     ]
+        , class CardCover
+            [ position relative
+            , backgroundColor greyL
+            , backgroundSize cover
+            , property "background-position" "center center"
+            , backgroundRepeat noRepeat
+              -- , backfaceVisibility hidden
+            , overflow hidden
+            , after
+                [ display block
+                , property "content" ""
+                , width (pct 100)
+                , paddingTop (pct 56.25)
+                ]
+            ]
           -- , class CardPrice
           --     [ display block
           --     , position absolute
@@ -129,10 +123,10 @@ css =
           --     , color white
           --       -- , backfaceVisibility hidden
           --     ]
-          -- , class CardHeading
-          --     [ margin (Css.rem 0.5) 0
-          --     , fontWeight 700
-          --     ]
+        , class CardHeading
+            [ margin2 (Css.rem 0.5) zero
+            , fontWeight (int 700)
+            ]
           -- , class CardSubHeading
           --     [ marginBottom 0
           --     , fontFamily bodyfont
