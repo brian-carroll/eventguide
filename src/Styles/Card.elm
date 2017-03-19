@@ -8,23 +8,7 @@ import Styles.Constants exposing (white, greyL, greyM, asphaltL, asphaltM)
 css : Stylesheet
 css =
     stylesheet
-        [ mediaQuery "only screen and (min-width: 480px)"
-            [ class CardList
-                [ padding2 zero (px 48)
-                ]
-            ]
-        , mediaQuery "only screen and (min-width: 480px)"
-            [ class Card
-                [ margin4 (px 16) (px 14) (px 40) (px 14)
-                , property "width" "calc(100% / 2 - 32px)"
-                ]
-            ]
-        , mediaQuery "only screen and (min-width: 800px)"
-            [ class Card
-                [ property "width" "calc(100% / 3 - 32px)"
-                ]
-            ]
-        , class CardList
+        [ class CardList
             [ descendants
                 [ class Card
                     [ display inlineBlock
@@ -46,6 +30,22 @@ css =
                         [ opacity zero
                         ]
                     ]
+                ]
+            ]
+        , mediaQuery "only screen and (min-width: 480px)"
+            [ class CardList
+                [ padding2 zero (px 48)
+                ]
+            ]
+        , mediaQuery "only screen and (min-width: 480px)"
+            [ class Card
+                [ margin4 (px 16) (px 14) (px 40) (px 14)
+                , property "width" "calc(100% / 2 - 32px)"
+                ]
+            ]
+        , mediaQuery "only screen and (min-width: 800px)"
+            [ class Card
+                [ property "width" "calc(100% / 3 - 32px)"
                 ]
             ]
         , class BgOverlay
@@ -97,6 +97,7 @@ css =
           --     ]
         , class CardCover
             [ position relative
+            , height (px 250)
             , backgroundColor greyL
             , backgroundSize cover
             , property "background-position" "center center"

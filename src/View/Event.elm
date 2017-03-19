@@ -27,14 +27,14 @@ event ev =
         ratio =
             ( 16, 9 )
 
-        height =
+        cardHeight =
             250
     in
         div
             [ class [ Card ] ]
-            [ div [ class [ CardCover ], style [ ( "height", toString height ++ "px" ) ] ]
+            [ div [ class [ CardCover ] ]
                 [ div [ class [ BgOverlay, BgOverlay_Dark, BgOverlay_25 ] ] []
-                , divBackgroundImage (selectClosestImageSize ratio height ev.images)
+                , divBackgroundImage (selectClosestImageSize ratio cardHeight ev.images)
                 ]
             , div [ class [ CardBody ] ]
                 [ h2 [ class [ CardHeading ] ] [ text ev.title ]
