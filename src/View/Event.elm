@@ -54,7 +54,41 @@ eventInfo icon displayText =
 
 dateFormat : Date -> String
 dateFormat d =
-    toString d
+    let
+        h24 =
+            Date.hour d
+
+        h12 =
+            h24 % 12
+
+        ampm =
+            if h24 < 12 then
+                "am"
+            else
+                "pm"
+
+        minuteString =
+            case Date.minute d of
+                0 ->
+                    ""
+
+                m ->
+                    toString m
+                        |> String.append "0"
+                        |> String.right 2
+                        |> String.append ":"
+    in
+        String.concat
+            [ toString <| Date.dayOfWeek d
+            , " "
+            , toString <| Date.day d
+            , " "
+            , toString <| Date.month d
+            , ", "
+            , toString h12
+            , minuteString
+            , ampm
+            ]
 
 
 divBackgroundImage : Maybe Image -> Html Msg
