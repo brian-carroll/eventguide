@@ -6,7 +6,7 @@ dist/elm.js: src/* src/*/* elm-package.json
 	elm make src/Main.elm --output dist/elm.js
 
 
-dist/index.css: src/Styles.elm
+dist/index.css: src/Styles.elm src/Styles/*
 	node_modules/.bin/elm-css --module Styles --output dist/ src/Styles.elm
 
 

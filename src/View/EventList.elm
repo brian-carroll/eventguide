@@ -10,7 +10,7 @@ import Html.CssHelpers
 
 import Types exposing (..)
 import View.Event exposing (event)
-import Styles exposing (CssClasses(..))
+import Styles.Selectors exposing (..)
 
 
 { id, class, classList } =
@@ -34,5 +34,5 @@ eventList events =
             text (toString error)
 
         Success data ->
-            div [ class [ Styles.EventList ] ]
+            div [ class [ CardList ] ]
                 (List.map event data)

@@ -14,7 +14,7 @@ import Html.CssHelpers
 import Types exposing (..)
 import State exposing (selectClosestImageSize)
 import View.Icons as Icons
-import Styles exposing (CssClasses(..))
+import Styles.Selectors exposing (..)
 
 
 { id, class, classList } =
@@ -31,15 +31,12 @@ event ev =
             115
     in
         div
-            [ class [ Styles.EventWrapper ] ]
-            [ div
-                [ class [ Styles.Event ] ]
-                [ divBackgroundImage (selectClosestImageSize ratio height ev.images)
-                , div []
-                    [ h4 [] [ text ev.title ]
-                    , eventInfo Icons.calendar (dateFormat ev.date)
-                    , eventInfo Icons.mapPin ev.venueLocation
-                    ]
+            [ class [ Card ] ]
+            [ divBackgroundImage (selectClosestImageSize ratio height ev.images)
+            , div []
+                [ h4 [] [ text ev.title ]
+                , eventInfo Icons.calendar (dateFormat ev.date)
+                , eventInfo Icons.mapPin ev.venueLocation
                 ]
             ]
 
@@ -67,7 +64,7 @@ divBackgroundImage maybeImage =
         defaultColor =
             "gray"
     in
-        div [ class [ EventImage ] ]
+        div [ class [ CardImage ] ]
             [ div
                 [ style
                     [ ( "width", "100%" )
