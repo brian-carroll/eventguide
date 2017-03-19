@@ -11,12 +11,13 @@ import Html.Attributes exposing (..)
 -- Local modules
 
 import Types exposing (..)
-import View.EventList exposing (..)
+import View.EventList exposing (eventList)
+import View.Header exposing (siteHeader)
 
 
 root : Model -> Html Msg
 root model =
-    div [ class "container" ]
-        [ h1 [] [ text "Brian's Event Guide" ]
+    div []
+        [ siteHeader
         , eventList model.events
         ]

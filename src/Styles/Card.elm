@@ -9,7 +9,9 @@ css : Stylesheet
 css =
     stylesheet
         [ class CardList
-            [ descendants
+            [ maxWidth (px 1200)
+            , margin auto
+            , descendants
                 [ class Card
                     [ display inlineBlock
                     , marginBottom (px 32)

@@ -123,7 +123,7 @@ fetchEvents start end =
             TicketMaster.searchUrl
                 [ ( "city", "london" )
                 , ( "countryCode", "gb" )
-                , ( "size", toString 10 )
+                , ( "size", toString 12 )
                 , ( "classificationName", "music" )
                 , ( "startDateTime", TicketMaster.dateFormat start )
                 , ( "endDateTime", TicketMaster.dateFormat end )
