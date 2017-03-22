@@ -145,5 +145,10 @@ css =
             , right zero
             , bottom zero
             , width (pct 100)
+            , height (pct 100)
+            , backgroundColor asphaltL
+            , backgroundPosition2 (pct 50) (pct 50)
+            , backgroundSize cover
+            , backgroundRepeat noRepeat
             ]
         ]

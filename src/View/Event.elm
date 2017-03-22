@@ -97,22 +97,9 @@ divBackgroundImage maybeImage =
         url =
             Maybe.map .url maybeImage
                 |> Maybe.withDefault ""
-
-        defaultColor =
-            "gray"
     in
-        div [ class [ CardImage ] ]
-            [ div
-                [ style
-                    [ ( "width", "100%" )
-                    , ( "height", "100%" )
-                    , ( "background-image", "url(" ++ url ++ ")" )
-                    , ( "background-color", defaultColor )
-                    , ( "background-position-x", "center" )
-                    , ( "background-position-y", "center" )
-                    , ( "background-size", "cover" )
-                    , ( "background-repeat", "no-repeat" )
-                    ]
-                ]
-                []
+        div
+            [ class [ CardImage ]
+            , style [ ( "background-image", "url(" ++ url ++ ")" ) ]
             ]
+            []
