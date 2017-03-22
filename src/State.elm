@@ -25,6 +25,7 @@ init : ( Model, Cmd Msg )
 init =
     ( { events = NotAsked
       , videos = Dict.empty
+      , modalVideo = Nothing
       , startDate = Date.fromTime 0
       , endDate = Date.fromTime 0
       }
@@ -114,6 +115,29 @@ update msg model =
 
                 Err _ ->
                     ( model, Cmd.none )
+
+        OpenModal searchTerm ->
+            let
+                maybeVideo =
+                    case Dict.get searchTerm model.videos of
+                        Just (Success videoList) ->
+                            List.head videoList
+
+                        _ ->
+                            Nothing
+            in
+                ( { model
+                    | modalVideo = maybeVideo
+                  }
+                , Cmd.none
+                )
+
+        CloseModal ->
+            ( { model
+                | modalVideo = Nothing
+              }
+            , Cmd.none
+            )
 
 
 fetchEvents : Date.Date -> Date.Date -> Cmd Msg

@@ -20,3 +20,7 @@ type Class
     | BgOverlay_75
     | BgOverlay_50
     | BgOverlay_25
+    | ModalWrapper
+    | Modal
+    | ModalFill
+    | ModalClose

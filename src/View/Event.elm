@@ -4,9 +4,10 @@ module View.Event exposing (event)
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
+import Html.CssHelpers
 import Maybe exposing (Maybe)
 import Date exposing (Date)
-import Html.CssHelpers
 
 
 -- Local modules
@@ -30,8 +31,8 @@ event ev =
         cardHeight =
             250
     in
-        div
-            [ class [ Card ] ]
+        a
+            [ class [ Card ], onClick (OpenModal ev.contentSearchTerm) ]
             [ div [ class [ CardCover ] ]
                 [ div [ class [ BgOverlay, BgOverlay_Dark, BgOverlay_25 ] ] []
                 , divBackgroundImage (selectClosestImageSize ratio cardHeight ev.images)

@@ -12,6 +12,7 @@ import Maybe.Extra
 import Styles.Selectors exposing (..)
 import Styles.Card
 import Styles.BgOverlay
+import Styles.Modal
 
 
 port files : CssFileStructure -> Cmd msg
@@ -33,6 +34,7 @@ css =
     mergeStyleSheets
         [ Styles.Card.css
         , Styles.BgOverlay.css
+        , Styles.Modal.css
         ]
 
 

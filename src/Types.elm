@@ -12,6 +12,8 @@ type Msg
     | ReceivedVideos String (Result Http.Error (List Video))
     | ChangeStartDate String
     | ChangeEndDate String
+    | OpenModal String
+    | CloseModal
 
 
 type RemoteData e a
@@ -28,6 +30,7 @@ type alias WebData a =
 type alias Model =
     { events : WebData (List Event)
     , videos : Dict String (WebData (List Video))
+    , modalVideo : Maybe Video
     , startDate : Date.Date
     , endDate : Date.Date
     }
