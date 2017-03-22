@@ -22,8 +22,8 @@ def matchToUpper(match):
 
 def process_file(text):
     s = StringSub(text)
-    s.sub(r';\s}', '\n]')
-    s.sub(r'{\s', '\n[')
+    s.sub(r';\s*}', '\n]')
+    s.sub(r'{', '\n[')
     s.sub(r';\s', '\n,')
     s.sub(r':', '')
     s.sub(r'\s\.([a-z])', lambda m: ', class ' + matchToUpper(m))  # class names
@@ -34,6 +34,7 @@ def process_file(text):
     s.sub(r'(\d+)\s*px', r'(px \1)')
     s.sub(r'(\d+)\s*rem', r'(Css.rem \1)')
     s.sub(r'(\s)0(\s)', r'\1zero\2')
+    s.sub(r'&', r' descendants ')
 
     elm = 'css =\n stylesheet\n' + s.val + ']'
     classes = re.findall(r'class (\S+)', elm)
