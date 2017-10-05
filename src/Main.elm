@@ -7,18 +7,10 @@ module Main exposing (main)
 -- External modules
 
 import Html
-import Task
-import Http
-import Platform.Cmd exposing (Cmd)
-import Date
-import Time
-import Dict exposing (Dict)
 
 
 -- Local modules
 
-import Api.TicketMaster as TicketMaster
-import Api.YouTube as YouTube
 import Types exposing (..)
 import View
 import State exposing (init, update)

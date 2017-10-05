@@ -27,20 +27,22 @@ modal model =
 
         Just video ->
             div [ class [ ModalWrapper ] ]
-                [ div [ class [ ModalFill ] ] []
-                , div [ class [ Modal ] ]
+                [ div
+                    [ class [ Modal ] ]
+                    [ iframe
+                        [ src video.url
+                        , width 600
+                        , height 400
+                        , attribute "frameborder" "0"
+                        , attribute "allowfullscreen" ""
+                        ]
+                        []
+                    ]
+                , div [ class [ ModalFill ] ]
                     [ a
                         [ class [ ModalClose ]
                         , property "innerHTML" <| string "&times;"
                         , onClick CloseModal
-                        ]
-                        []
-                    , iframe
-                        [ src video.url
-                        , width 205
-                        , height 115
-                        , attribute "frameborder" "0"
-                        , attribute "allowfullscreen" ""
                         ]
                         []
                     ]

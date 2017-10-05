@@ -9,7 +9,10 @@ css : Stylesheet
 css =
     stylesheet
         [ class ModalWrapper
-            [ position fixed
+            [ property "display" "flex"
+            , alignItems center
+            , justifyContent center
+            , position fixed
             , top zero
             , right zero
             , bottom zero
@@ -24,19 +27,18 @@ css =
             , opacity (num 0.5)
             , property "transition" <| "all 0.3s 0.4s" ++ cubic
             ]
+        , class Iframe
+            [ minWidth (pc 100)
+            ]
         , class Modal
-            [ position absolute
-            , top (pct 50)
-            , left (pct 50)
-            , property "width" "calc(100% - 10px)"
-            , maxWidth (px 580)
+            [ width (px 600)
             , property "maxHeight" "calc(100vh - 50px)"
             , overflowY auto
             , backgroundColor greyXl
             , boxShadow5 (px 0) (px 1) (px 2) (px 0) (rgba 0 0 0 0.12)
             , borderRadius (px 2)
-            , transform <| translate2 (pct -50) (pct 500)
             , property "transition" <| "all 0.6s" ++ cubic
+            , zIndex (int 10)
             ]
         , mediaQuery "only screen and (minWidth (px 460))"
             [ class Modal

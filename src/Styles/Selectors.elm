@@ -24,3 +24,4 @@ type Class
     | Modal
     | ModalFill
     | ModalClose
+    | Iframe
